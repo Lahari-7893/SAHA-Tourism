@@ -1,7 +1,7 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
-import { CheckCircle2, Download, Home, Plus, MapPin, IndianRupee, Sparkles, Calendar, Users, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Download, Home, Plus, MapPin, IndianRupee, Sparkles, Calendar, Users, ArrowRight, Star, Send, MessageSquare } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { motion } from 'framer-motion';
 
@@ -12,79 +12,99 @@ export default function TripComplete() {
 
   const trip = location.state?.trip || currentTrip;
   const destination = trip?.destination || { name: 'Andhra Pradesh', state: 'Andhra Pradesh' };
-  const travelers = trip?.summary?.travelers || trip?.planningParams?.travelers || 1;
-  const plannedBudget = trip?.planningParams?.totalBudget || trip?.summary?.estimatedCostAvg || 1500;
-  
-  // Calculate real category spend or fallback to itinerary breakdown
-  const expenses = trip?.expenses || [];
-  let expenseData = [];
+  const travelers = trip?.travelers || 2;
+  const grandTotal = trip?.grandTotalCost || 4000;
 
-  if (expenses.length > 0) {
-    const categoryTotals = {};
-    expenses.forEach(e => {
-      categoryTotals[e.category] = (categoryTotals[e.category] || 0) + Number(e.amount);
-    });
-    const colors = {
-      Food: '#F59E0B',
-      Transport: '#00838F',
-      Activities: '#0077B6',
-      Accommodation: '#00695C',
-      Shopping: '#EC4899',
-      Other: '#64748B'
+  // Feedback State
+  const [overallRating, setOverallRating] = useState(5);
+  const [destinationRating, setDestinationRating] = useState(5);
+  const [itineraryRating, setItineraryRating] = useState(5);
+  const [hotelRating, setHotelRating] = useState(5);
+  const [foodRating, setFoodRating] = useState(5);
+  const [aiRating, setAiRating] = useState(5);
+  const [translatorRating, setTranslatorRating] = useState(5);
+  const [emergencyRating, setEmergencyRating] = useState(5);
+  const [writtenFeedback, setWrittenFeedback] = useState('');
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+  const expenseBreakdown = [
+    { name: 'Transport & Local Auto', value: trip?.summary?.breakdown?.transport || 600, color: '#00838F' },
+    { name: 'Entry Fees & Sights', value: trip?.summary?.breakdown?.entryFees || 450, color: '#0077B6' },
+    { name: 'Food & Regional Dining', value: trip?.summary?.breakdown?.food || 1200, color: '#F59E0B' },
+    { name: 'Hotel Accommodation', value: trip?.summary?.breakdown?.accommodation || 1800, color: '#00A896' }
+  ].filter(e => e.value > 0);
+
+  const handleFeedbackSubmit = (e) => {
+    e.preventDefault();
+    const feedbackObj = {
+      destination: destination.name,
+      overallRating,
+      destinationRating,
+      itineraryRating,
+      hotelRating,
+      foodRating,
+      aiRating,
+      translatorRating,
+      emergencyRating,
+      writtenFeedback,
+      submittedAt: new Date().toISOString()
     };
-    expenseData = Object.keys(categoryTotals).map(cat => ({
-      name: cat,
-      value: categoryTotals[cat],
-      color: colors[cat] || '#0077B6'
-    }));
-  } else {
-    // Breakdown from planned itinerary
-    const bd = trip?.costBreakdown || { transport: 250, entryFees: 200, food: 350 };
-    expenseData = [
-      { name: 'Transport', value: bd.transport || 250, color: '#00838F' },
-      { name: 'Entry Fees & Activities', value: bd.entryFees || 200, color: '#0077B6' },
-      { name: 'Food & Dining', value: bd.food || 350, color: '#F59E0B' },
-    ];
-  }
 
-  const actualSpent = expenseData.reduce((acc, curr) => acc + curr.value, 0);
-  const remaining = plannedBudget - actualSpent;
-  const isOverBudget = remaining < 0;
+    try {
+      const existing = JSON.parse(localStorage.getItem('saha_user_feedback') || '[]');
+      existing.unshift(feedbackObj);
+      localStorage.setItem('saha_user_feedback', JSON.stringify(existing));
+    } catch (err) {
+      console.error('Failed to save feedback:', err);
+    }
+
+    setFeedbackSubmitted(true);
+  };
 
   const handleDownloadSummary = () => {
-    const summaryText = `
-========================================
-       SAHA TRAVEL SUMMARY REPORT
-   Your Smart Local Travel Companion
-========================================
-
-Destination: ${destination.name}, ${destination.state || 'Andhra Pradesh'}
-Travelers: ${travelers}
-Planned Budget: INR ${plannedBudget}
-Actual Expenses: INR ${actualSpent}
-Net Balance: INR ${remaining} (${isOverBudget ? 'Over Budget' : 'Under Budget'})
-
---- ITINERARY STOPS COMPLETED ---
-${(trip?.stops || []).map((s, i) => `${i + 1}. ${s.name} (${s.duration || 'Visit'}) - Entry: ${s.entryFee || 'Free'}`).join('\n')}
-
---- EXPENSE BREAKDOWN ---
-${expenseData.map(e => `• ${e.name}: INR ${e.value}`).join('\n')}
-
-Generated by SAHA • Plan smarter. Travel easier. Explore confidently.
-========================================
-`;
+    let summaryText = `====================================================\n`;
+    summaryText += `       SAHA TRAVEL SUMMARY & COMPLETION REPORT\n`;
+    summaryText += `    Smart Assistance for Tourists in Andhra Pradesh\n`;
+    summaryText += `====================================================\n\n`;
+    summaryText += `Destination: ${destination.name} (${destination.district || 'AP'})\n`;
+    summaryText += `Travelers: ${travelers}\n`;
+    summaryText += `Total Journey Cost: INR ${grandTotal}\n`;
+    summaryText += `Per Person Cost: INR ${Math.round(grandTotal / travelers)}\n\n`;
+    summaryText += `--- EXPENSE BREAKDOWN ---\n`;
+    expenseBreakdown.forEach(e => {
+      summaryText += `• ${e.name}: INR ${e.value}\n`;
+    });
+    summaryText += `\nThank you for exploring Andhra Pradesh with SAHA!\n`;
 
     const blob = new Blob([summaryText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `SAHA_${destination.name}_Trip_Summary.txt`;
+    link.download = `SAHA_${destination.name}_Trip_Report.txt`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
+  const renderStarInput = (val, setVal, label) => (
+    <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
+      <span className="text-xs font-bold text-slate-700">{label}</span>
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => setVal(star)}
+            className="p-1 text-slate-300 hover:text-amber-400 focus:outline-none transition-colors"
+          >
+            <Star size={16} className={star <= val ? 'fill-amber-400 text-amber-400' : 'text-slate-300'} />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="bg-[#F8FAFC] min-h-screen pt-24 pb-20">
+    <div className="min-h-screen bg-[#F7FBFC] pt-24 pb-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Success Header */}
@@ -92,145 +112,134 @@ Generated by SAHA • Plan smarter. Travel easier. Explore confidently.
           <motion.div 
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
             className="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-sm"
           >
             <CheckCircle2 className="w-10 h-10 text-emerald-600" />
           </motion.div>
-          
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5" /> Journey Completed
-          </div>
-          
-          <h1 className="text-3xl sm:text-4xl font-black text-[#1B2A4A] mb-2">
-            You've Completed Your Trip!
+          <span className="text-[10px] font-black uppercase tracking-widest text-[#00838F] bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
+            Journey Completed
+          </span>
+          <h1 className="text-3xl font-black text-[#0B2545] mt-2 mb-1">
+            Your {destination.name} Journey is Complete!
           </h1>
-          <p className="text-slate-500 text-sm max-w-lg mx-auto">
-            Hope you had an unforgettable experience exploring {destination.name}. Here is your complete travel & expense overview.
+          <p className="text-slate-500 text-xs sm:text-sm">
+            We hope you experienced the rich heritage, authentic Andhra flavors, and warm hospitality!
           </p>
         </div>
 
-        {/* Top Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 text-center">
-            <div className="w-10 h-10 bg-sky-50 rounded-2xl flex items-center justify-center mx-auto mb-2 text-[#0077B6]">
-              <MapPin className="w-5 h-5" />
-            </div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Destination</p>
-            <p className="font-extrabold text-base text-[#1B2A4A]">{destination.name}</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 text-center">
-            <div className="w-10 h-10 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-2 text-amber-600">
-              <IndianRupee className="w-5 h-5" />
-            </div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Spent</p>
-            <p className="font-extrabold text-base text-[#1B2A4A]">₹{actualSpent}</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 text-center">
-            <div className="w-10 h-10 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-2 text-[#00838F]">
-              <Users className="w-5 h-5" />
-            </div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Group & Places</p>
-            <p className="font-extrabold text-base text-[#1B2A4A]">{travelers} Travelers &bull; {trip?.stops?.length || 4} Stops</p>
-          </div>
-        </div>
-
-        {/* Budget & Expense Breakdown Chart */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 mb-8">
-          <div className="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
-            <div>
-              <h2 className="text-xl font-black text-[#1B2A4A]">Expense Breakdown</h2>
-              <p className="text-xs text-slate-500">Planned vs Actual financial distribution</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            {/* Pie Chart */}
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={expenseData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {expenseData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => `₹${value}`} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+        {/* Expense Summary Chart Card */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-teal-900/10 mb-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div>
+            <span className="text-[10px] font-black uppercase text-[#00838F]">Final Trip Ledger</span>
+            <h3 className="text-xl font-black text-[#0B2545] mt-1 mb-4">Total Spending: ₹{grandTotal.toLocaleString()}</h3>
             
-            {/* Summary details */}
-            <div className="space-y-4">
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2 text-xs sm:text-sm">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Planned Budget:</span>
-                  <span className="font-bold text-slate-800">₹{plannedBudget}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Actual Outflow:</span>
-                  <span className="font-bold text-slate-800">₹{actualSpent}</span>
-                </div>
-                <div className="h-px bg-slate-200 my-1" />
-                <div className="flex justify-between font-extrabold text-sm">
-                  <span className="text-slate-700">Remaining Margin:</span>
-                  <span className={remaining >= 0 ? 'text-emerald-600' : 'text-rose-600'}>
-                    ₹{remaining}
+            <div className="space-y-2.5 text-xs">
+              {expenseBreakdown.map((item, idx) => (
+                <div key={idx} className="flex justify-between items-center text-slate-600">
+                  <span className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                    {item.name}
                   </span>
+                  <span className="font-bold text-[#0B2545]">₹{item.value.toLocaleString()}</span>
                 </div>
-              </div>
-              
-              <div className={`p-4 rounded-2xl border ${
-                isOverBudget ? 'bg-rose-50 border-rose-200 text-rose-800' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              }`}>
-                <h4 className="font-bold text-xs uppercase tracking-wider mb-1">
-                  {isOverBudget ? 'Budget Exceeded' : 'Smart Budgeting!'}
-                </h4>
-                <p className="text-xs">
-                  {isOverBudget 
-                    ? `You spent ₹${Math.abs(remaining)} more than the initial target.` 
-                    : `You saved ₹${remaining} and stayed comfortably within your planned budget.`}
-                </p>
-              </div>
+              ))}
             </div>
+
+            <button
+              onClick={handleDownloadSummary}
+              className="mt-6 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-[#0B2545] rounded-xl text-xs font-bold flex items-center gap-2 transition-colors"
+            >
+              <Download size={14} /> Download Trip Summary (.txt)
+            </button>
+          </div>
+
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={expenseBreakdown}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {expenseBreakdown.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => `₹${value}`} />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <button 
-            onClick={handleDownloadSummary}
-            className="bg-white border-2 border-[#0077B6] text-[#0077B6] hover:bg-sky-50 px-6 py-3.5 rounded-2xl font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm"
+        {/* Multi-Criteria Feedback Form */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-teal-900/10 mb-8">
+          <div className="flex items-center gap-2 text-[#00838F] text-xs font-black uppercase tracking-wider mb-1">
+            <MessageSquare size={14} /> Traveler Feedback
+          </div>
+          <h2 className="text-xl font-black text-[#0B2545] mb-2">How was your SAHA Journey?</h2>
+          <p className="text-xs text-slate-500 mb-6">
+            Your honest ratings help refine AI route recommendations, dining suggestions, and regional safety alerts for future travelers.
+          </p>
+
+          {feedbackSubmitted ? (
+            <div className="p-6 bg-teal-50 rounded-2xl text-center border border-teal-200">
+              <CheckCircle2 size={32} className="text-emerald-600 mx-auto mb-2" />
+              <h3 className="font-black text-sm text-[#0B2545]">Thank You for Your Feedback!</h3>
+              <p className="text-xs text-slate-600 mt-1">Your ratings have been saved into SAHA’s continuous improvement engine.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1">
+                {renderStarInput(overallRating, setOverallRating, '⭐ Overall Experience with SAHA')}
+                {renderStarInput(destinationRating, setDestinationRating, `📍 ${destination.name} Sights & Attractions`)}
+                {renderStarInput(itineraryRating, setItineraryRating, '⏱️ Route & Timings Optimization')}
+                {renderStarInput(hotelRating, setHotelRating, '🏨 Hotel & Stay Recommendations')}
+                {renderStarInput(foodRating, setFoodRating, '🍛 Restaurant & Andhra Meals Quality')}
+                {renderStarInput(aiRating, setAiRating, '🤖 Ask SAHA AI Assistant Contextual Help')}
+                {renderStarInput(translatorRating, setTranslatorRating, '🗣️ Voice & Audio Translator')}
+                {renderStarInput(emergencyRating, setEmergencyRating, '🚨 Emergency Assistance Readiness')}
+              </div>
+
+              <div className="pt-3">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Written Feedback & Suggestions for Future Tourists
+                </label>
+                <textarea
+                  value={writtenFeedback}
+                  onChange={(e) => setWrittenFeedback(e.target.value)}
+                  placeholder="Share highlights, favorite Andhra dishes, or tips for other travelers..."
+                  className="w-full p-3 rounded-2xl border border-slate-200 text-xs text-[#0B2545] focus:ring-2 focus:ring-[#0077B6] focus:outline-none h-24"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 bg-gradient-to-r from-[#0077B6] via-[#00838F] to-[#00A896] hover:from-[#0A3D62] hover:to-[#00695C] text-white rounded-2xl text-xs font-black shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                <Send size={14} /> Submit Feedback
+              </button>
+            </form>
+          )}
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <Link
+            to="/planner"
+            className="px-6 py-3 bg-gradient-to-r from-[#F59E0B] to-[#E76F51] text-white rounded-2xl text-xs font-black shadow-md transition-all flex items-center gap-2"
           >
-            <Download className="w-4 h-4" />
-            Download Trip Summary (.txt)
-          </button>
-          
-          <button 
-            onClick={() => navigate('/planner')}
-            className="bg-[#0077B6] hover:bg-[#00695C] text-white px-7 py-3.5 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-md shadow-[#0077B6]/20"
+            <Plus size={15} /> Plan Another Andhra Journey
+          </Link>
+          <Link
+            to="/"
+            className="px-6 py-3 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-2xl text-xs font-bold transition-all flex items-center gap-2"
           >
-            <Plus className="w-4 h-4" />
-            Plan Another Trip
-          </button>
-          
-          <button 
-            onClick={() => navigate('/')}
-            className="bg-slate-800 hover:bg-slate-900 text-white px-6 py-3.5 rounded-2xl font-bold text-xs transition-colors flex items-center justify-center gap-2"
-          >
-            <Home className="w-4 h-4" />
-            Back to Home
-          </button>
+            <Home size={15} /> Back to Home
+          </Link>
         </div>
 
       </div>

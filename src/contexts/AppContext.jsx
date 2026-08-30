@@ -9,6 +9,7 @@ export function AppProvider({ children }) {
   const [currentTrip, setCurrentTrip] = useState(() => storageService.getCurrentTrip());
   const [favorites, setFavorites] = useState(() => storageService.getFavorites());
   const [settings, setSettings] = useState(() => storageService.getSettings());
+  const [visitedDestinations, setVisitedDestinations] = useState(() => storageService.getVisitedDestinations());
 
   const isAuthenticated = !!user;
 
@@ -123,6 +124,12 @@ export function AppProvider({ children }) {
     setSettings(prev => ({ ...prev, ...newSettings }));
   }, []);
 
+  // Passport
+  const markVisited = useCallback((destId) => {
+    const updated = storageService.markDestinationVisited(destId);
+    setVisitedDestinations(updated);
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -148,6 +155,9 @@ export function AppProvider({ children }) {
         // Settings
         settings,
         updateSettings,
+        // Passport
+        visitedDestinations,
+        markVisited,
       }}
     >
       {children}

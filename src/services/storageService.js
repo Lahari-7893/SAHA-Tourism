@@ -113,4 +113,16 @@ export const storageService = {
   clearAll: () => {
     Object.values(KEYS).forEach(key => localStorage.removeItem(key));
   },
+
+  // Passport & Visited Destinations
+  getVisitedDestinations: () => safeGet('saha_visited_destinations', []),
+  markDestinationVisited: (destId) => {
+    const visited = safeGet('saha_visited_destinations', []);
+    if (!visited.includes(destId)) {
+      visited.push(destId);
+      safeSet('saha_visited_destinations', visited);
+    }
+    return visited;
+  },
+  resetPassport: () => safeSet('saha_visited_destinations', []),
 };

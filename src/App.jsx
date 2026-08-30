@@ -8,12 +8,19 @@ import DestinationDetails from './pages/DestinationDetails';
 import Planner from './pages/Planner';
 import Itinerary from './pages/Itinerary';
 import MyTrip from './pages/MyTrip';
+import Hotels from './pages/Hotels';
+import Food from './pages/Food';
+import InteractiveMap from './pages/InteractiveMap';
+import BudgetCalculator from './pages/BudgetCalculator';
+import HiddenGems from './pages/HiddenGems';
 import Transport from './pages/Transport';
 import Language from './pages/Language';
 import AskSaha from './pages/AskSaha';
 import Safety from './pages/Safety';
 import Profile from './pages/Profile';
 import TripComplete from './pages/TripComplete';
+import Passport from './pages/Passport';
+import Journal from './pages/Journal';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useApp();
@@ -86,6 +93,46 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/hotels"
+          element={
+            <ProtectedRoute>
+              <Hotels />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/food"
+          element={
+            <ProtectedRoute>
+              <Food />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/map"
+          element={
+            <ProtectedRoute>
+              <InteractiveMap />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/budget-calculator"
+          element={
+            <ProtectedRoute>
+              <BudgetCalculator />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hidden-gems"
+          element={
+            <ProtectedRoute>
+              <HiddenGems />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/transport"
           element={
             <ProtectedRoute>
@@ -122,6 +169,22 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/passport"
+          element={
+            <ProtectedRoute>
+              <Passport />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/journal"
+          element={
+            <ProtectedRoute>
+              <Journal />
             </ProtectedRoute>
           }
         />

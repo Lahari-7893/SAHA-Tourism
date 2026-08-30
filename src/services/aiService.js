@@ -1,144 +1,124 @@
+// SAHA - Context-Aware Tourism AI Assistant for Andhra Pradesh
+// Grounded reasoning with real destination data, restaurants, hotels, transport, and emergency services
+
 import { destinations, getDestinationBySlug } from '../data/destinations';
-import { attractions, getAttractionsByDestination } from '../data/attractions';
-import { foodItems } from '../data/food';
-import { transportModes } from '../data/transport';
-import { safetyContacts } from '../data/safety';
+import { getAttractionsByDestination } from '../data/attractions';
+import { getRestaurantsByDestination, regionalDishes } from '../data/food';
+import { getHotelsByDestination } from '../data/hotels';
+import { emergencyNumbers, emergencyFacilities } from '../data/safety';
 
-/**
- * Process a user question using structured regional tourism data.
- * Context: { destination, currentTrip, itinerary, budget, remainingBudget, travelers, interests, currentLocation }
- */
 export function processQuery(query, context = {}) {
-  const q = query.toLowerCase().trim();
-  const dest = context.currentTrip?.destination || context.destination || destinations.find(d => d.slug === 'vijayawada');
-  const destId = dest?.id || 'vijayawada';
-  const destAttractions = getAttractionsByDestination(destId);
-  const destFood = foodItems.filter(f => !f.destinations || f.destinations.includes(destId) || f.destinations.length === 0);
-  const travelers = context.travelers || context.currentTrip?.planningParams?.travelers || 1;
-  const remainingBudget = context.remainingBudget !== undefined 
-    ? context.remainingBudget 
-    : (context.currentTrip ? ((context.currentTrip.planningParams?.totalBudget || 1000) - (context.currentTrip.totalSpent || 0)) : 500);
-
-  // 1. Budget specific questions (e.g. "I have 200 left", "under 500", "what can I afford")
-  const budgetMatch = q.match(/(\d+)\s*(?:rs|rupees|inr|left|budget)?/i);
-  const askedAmount = budgetMatch ? parseInt(budgetMatch[1]) : null;
-
-  if (askedAmount !== null && (q.includes('left') || q.includes('budget') || q.includes('afford') || q.includes('do with') || q.includes('under') || q.includes('cost'))) {
-    const affordableAttractions = destAttractions.filter(a => {
-      const fee = (a.approximateEntryFee || 0) * travelers;
-      return fee <= askedAmount;
-    });
-
-    const affordableFood = destFood.filter(f => (f.approximatePrice || 100) * travelers <= askedAmount);
-
-    let message = `With ₹${askedAmount} for ${travelers} traveler${travelers > 1 ? 's' : ''} in ${dest?.name || 'this area'}, here is what fits your budget:`;
-    
+  if (!query || typeof query !== 'string') {
     return {
-      type: 'budget_recommendation',
-      message,
-      data: {
-        budget: askedAmount,
-        attractions: affordableAttractions.slice(0, 3),
-        food: affordableFood.slice(0, 2),
-        isApproximate: true
-      }
+      type: 'text',
+      message: 'Hello! I am SAHA, your Andhra Pradesh local travel assistant. Ask me about itineraries, nearby restaurants, hotels, local transport, or emergencies!'
     };
   }
 
-  // 2. Time specific questions (e.g. "in two hours", "2 hours", "30 mins", "half day")
-  const timeMatch = q.match(/(\d+)\s*(?:hour|hr|minute|min)/i);
-  if (timeMatch || q.includes('time') || q.includes('quick') || q.includes('short')) {
-    const requestedMinutes = timeMatch ? (q.includes('min') ? parseInt(timeMatch[1]) : parseInt(timeMatch[1]) * 60) : 120;
-    
-    const fittingStops = destAttractions.filter(a => (a.suggestedDuration || 60) <= requestedMinutes);
-    
-    return {
-      type: 'time_recommendation',
-      message: `For ${requestedMinutes >= 60 ? `${Math.round(requestedMinutes/60)} hour(s)` : `${requestedMinutes} minutes`} in ${dest?.name || 'the area'}, here are practical visits with realistic durations:`,
-      data: {
-        minutes: requestedMinutes,
-        attractions: fittingStops.slice(0, 3),
-        isApproximate: true
-      }
-    };
-  }
+  const q = query.toLowerCase();
+  const currentDestId = context.destination?.id || context.destinationId || 'dest_vjw';
+  const dest = destinations.find(d => d.id === currentDestId || d.slug === currentDestId) || destinations[0];
+  const destAttractions = getAttractionsByDestination(dest.id);
+  const destRestaurants = getRestaurantsByDestination(dest.id);
+  const destHotels = getHotelsByDestination(dest.id);
+  const destFacilities = emergencyFacilities.filter(f => f.destinationId === dest.id);
 
-  // 3. Food / Dining questions
-  if (q.includes('food') || q.includes('eat') || q.includes('dish') || q.includes('restaurant') || q.includes('lunch') || q.includes('breakfast') || q.includes('dinner') || q.includes('snack') || q.includes('biryani')) {
-    const suggestions = destFood.length > 0 ? destFood : foodItems;
+  // 1. EAT / FOOD / RESTAURANT QUERY ("Where can I eat now?", "Food near me", "What to eat")
+  if (q.includes('eat') || q.includes('food') || q.includes('restaurant') || q.includes('lunch') || q.includes('dinner') || q.includes('breakfast') || q.includes('bhojanam') || q.includes('biryani')) {
+    const isVeg = q.includes('veg') && !q.includes('non');
+    const matchedRests = destRestaurants.filter(r => isVeg ? r.isVegetarian : true);
+    const topRest = matchedRests[0] || destRestaurants[0];
+    const famousDishes = regionalDishes.filter(d => d.destinationId === dest.id || true).slice(0, 3);
+
     return {
       type: 'food_recommendation',
-      message: `Iconic regional culinary specialties in ${dest?.name || 'Andhra Pradesh'} to try:`,
-      data: {
-        destination: dest?.name,
-        dishes: suggestions.slice(0, 4),
-        isApproximate: true
-      }
+      message: `Here are the top-rated local dining options in **${dest.name}**:`,
+      restaurants: matchedRests.slice(0, 3),
+      recommendedDish: famousDishes.map(d => `${d.name} (approx. ₹${d.approximatePrice})`).join(', '),
+      tips: `In ${dest.name}, don't miss the authentic Andhra Meals served on banana leaf with fresh ghee and Gongura pachadi!`
     };
   }
 
-  // 4. Transport questions (e.g. "how to travel", "auto vs cab", "with 6 people")
-  if (q.includes('transport') || q.includes('travel') || q.includes('auto') || q.includes('cab') || q.includes('taxi') || q.includes('bus') || q.includes('people') || q.includes('group')) {
-    const groupMatch = q.match(/(\d+)\s*(?:people|person|travelers|pax)/i);
-    const count = groupMatch ? parseInt(groupMatch[1]) : travelers;
+  // 2. NEXT VISIT / WHAT TO VISIT NEXT
+  if (q.includes('next') || q.includes('what to see') || q.includes('visit next') || q.includes('where next') || q.includes('attractions')) {
+    const unvisited = destAttractions.slice(0, 3);
+    return {
+      type: 'attractions_recommendation',
+      message: `Based on your location in **${dest.name}**, here are the top places to explore next:`,
+      attractions: unvisited,
+      contextNote: `Current destination: ${dest.name} (${dest.region}). Timings and entry fees are verified for 2026.`
+    };
+  }
 
-    let recommendation = '';
-    let suitableModes = [];
+  // 3. MISSED ATTRACTION / RUNNING LATE / TIME DELAY
+  if (q.includes('missed') || q.includes('late') || q.includes('delay') || q.includes('traffic') || q.includes('behind schedule')) {
+    return {
+      type: 'replanning_advice',
+      message: `No worries! Let's adapt your schedule smoothly:`,
+      suggestions: [
+        `1. Skip the crowded indoor museum/queue if time is tight and proceed directly to **${destAttractions[0]?.name || 'the main scenic spot'}**.`,
+        `2. Ensure you reach the sunset viewpoint by 05:30 PM (ideal sunset light).`,
+        `3. Push your dinner to 08:30 PM at a nearby restaurant like **${destRestaurants[0]?.name || 'Subbayya Gari Hotel'}**.`
+      ],
+      action: 'Click "Replan My Day" on your active trip dashboard to recalculate timings automatically.'
+    };
+  }
 
-    if (count <= 2) {
-      recommendation = `For ${count} traveler(s), an Auto-rickshaw (₹30 base + ~₹13/km) or City Bus is the fastest & most economical option.`;
-      suitableModes = transportModes.filter(m => ['auto', 'cab', 'walking'].includes(m.id));
-    } else if (count <= 4) {
-      recommendation = `For a group of ${count}, an App/Local Cab (₹50 base + ~₹14/km) or a 4-seater Auto provides the best balance of comfort and shared cost.`;
-      suitableModes = transportModes.filter(m => ['cab', 'auto'].includes(m.id));
-    } else {
-      recommendation = `For a larger group of ${count} travelers, booking a Tempo Traveller / Maxicab (₹18-22/km) or two separate autos/cabs is most convenient.`;
-      suitableModes = transportModes.filter(m => ['tempo_traveller', 'cab'].includes(m.id));
-    }
+  // 4. BUDGET / LOW MONEY ("I only have ₹1,000 left", "Budget options")
+  if (q.includes('budget') || q.includes('money') || q.includes('cost') || q.includes('₹') || q.includes('rupees') || q.includes('left') || q.includes('cheap')) {
+    const freeOrCheapAttractions = destAttractions.filter(a => a.approximateEntryFee <= 25);
+    return {
+      type: 'budget_advice',
+      message: `Here is how you can make the most of your remaining budget in **${dest.name}**:`,
+      budgetSights: freeOrCheapAttractions,
+      advice: [
+        `• Public transport & Auto sharing: ₹30–₹50 per ride instead of private cabs.`,
+        `• Authentic local meals / Tiffins (Pesarattu / Meals): ₹70–₹180 per person.`,
+        `• Iconic free landmarks: ${freeOrCheapAttractions.map(a => a.name).join(', ')}.`
+      ]
+    };
+  }
+
+  // 5. HOTEL / STAY ("Find hotels", "Where to stay", "Hotels near destination")
+  if (q.includes('hotel') || q.includes('stay') || q.includes('resort') || q.includes('accommodation') || q.includes('room')) {
+    return {
+      type: 'hotel_recommendation',
+      message: `Verified accommodations in **${dest.name}**:`,
+      hotels: destHotels.slice(0, 3),
+      bookingTip: 'Book APTDC Haritha Resorts in advance during weekends and temple festival seasons.'
+    };
+  }
+
+  // 6. EMERGENCY / POLICE / HOSPITAL / SAFETY
+  if (q.includes('emergency') || q.includes('help') || q.includes('hospital') || q.includes('police') || q.includes('doctor') || q.includes('safe') || q.includes('ambulance')) {
+    const hospitals = destFacilities.filter(f => f.type === 'hospital');
+    const police = destFacilities.filter(f => f.type === 'police');
 
     return {
-      type: 'transport_recommendation',
-      message: recommendation,
-      data: {
-        travelers: count,
-        modes: suitableModes,
-        note: 'Approximate fares — actual price may vary by time and local meter/app.'
-      }
+      type: 'emergency_assistance',
+      message: `🚨 **Immediate Emergency Contacts in Andhra Pradesh:**`,
+      helplines: emergencyNumbers,
+      nearestHospital: hospitals[0] || { name: 'Government General Hospital', phone: '108', openStatus: '24/7' },
+      nearestPolice: police[0] || { name: 'Local Police Station', phone: '100', openStatus: '24/7' },
+      urgentAdvice: 'For immediate life or medical emergency, call **112** or **108** right away.'
     };
   }
 
-  // 5. Emergency / Safety questions
-  if (q.includes('emergency') || q.includes('police') || q.includes('hospital') || q.includes('help') || q.includes('safety') || q.includes('accident') || q.includes('lost')) {
-    return {
-      type: 'emergency_info',
-      message: `For any urgent emergency assistance in India, call National Emergency Support immediately:`,
-      data: {
-        emergencyNumber: '112',
-        police: '100',
-        ambulance: '108',
-        touristHelpline: '1363',
-        note: 'SAHA does not replace official emergency services. In real distress, dial 112 without delay.'
-      }
-    };
-  }
-
-  // 6. Nearby / What to see / Places questions
-  if (q.includes('nearby') || q.includes('visit') || q.includes('see') || q.includes('attraction') || q.includes('place') || q.includes('where to go') || q.includes('next')) {
-    return {
-      type: 'places_recommendation',
-      message: `Top verified sights and cultural landmarks in ${dest?.name || 'the area'}:`,
-      data: {
-        destination: dest?.name,
-        attractions: destAttractions.slice(0, 4),
-        isApproximate: true
-      }
-    };
-  }
-
-  // 7. General fallback with verified guidance
+  // 7. DEFAULT DESTINATION INTELLIGENCE
   return {
-    type: 'text',
-    message: `I can help you navigate ${dest?.name || 'your destination'}. You can ask me:\n• "I have ₹300 left. What can I do?"\n• "What can I see in 2 hours?"\n• "Where should I eat authentic Andhra food?"\n• "How should I travel with ${travelers} people?"\n• "Emergency safety helpline numbers"`,
-    data: null
+    type: 'destination_info',
+    message: `**${dest.name}** (${dest.district} District, ${dest.region}): ${dest.description}`,
+    keyHighlights: [
+      `🏛️ **Top Attractions**: ${destAttractions.slice(0, 3).map(a => a.name).join(', ')}`,
+      `🍛 **Famous Cuisine**: ${dest.famousFood.join(', ')}`,
+      `🏨 **Top Stays**: ${destHotels.map(h => h.name).slice(0, 2).join(', ')}`,
+      `🚗 **Transport**: Connected via auto rickshaws, cabs, and APSRTC buses.`
+    ],
+    quickSuggestions: [
+      'Where can I eat lunch nearby?',
+      'What are the best places to visit today?',
+      'Find verified hotels nearby',
+      'Show emergency contacts'
+    ]
   };
 }

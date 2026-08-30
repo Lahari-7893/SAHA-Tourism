@@ -52,8 +52,45 @@ function MapUpdater({ center, bounds }) {
 }
 
 export default function MapView({ stops = [], center, height = '350px', zoom = 12 }) {
-  // Default to Vijayawada coords if none provided
-  const defaultCenter = center || { lat: 16.5062, lng: 80.6480 };
+  const [userLocation, setUserLocation] = React.useState(null);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        },
+        (err) => console.warn('MapView location error:', err),
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    }
+  }, []);
+
+  const userLocationIcon = L.divIcon({
+    className: 'custom-map-pin',
+    html: `
+      <div style="
+        background: #2563EB;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+        border: 2px solid white;
+        animation: pulse 1.5s infinite;
+      ">
+        <span style="font-size: 10px;">📍</span>
+      </div>
+    `,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12]
+  });
+
+  // Default to India center if none provided and no stops
+  const defaultCenter = center || { lat: 20.5937, lng: 78.9629 };
 
   const validStops = stops.filter(s => s.coordinates && s.coordinates.lat && s.coordinates.lng);
   
@@ -71,7 +108,7 @@ export default function MapView({ stops = [], center, height = '350px', zoom = 1
     <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm relative" style={{ height }}>
       <MapContainer
         center={mapCenter}
-        zoom={zoom}
+        zoom={validStops.length > 0 ? zoom : 5}
         scrollWheelZoom={false}
         style={{ height: '100%', width: '100%' }}
       >
@@ -80,6 +117,18 @@ export default function MapView({ stops = [], center, height = '350px', zoom = 1
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapUpdater center={mapCenter} bounds={bounds} />
+
+        {/* User Location Marker */}
+        {userLocation && (
+          <Marker position={[userLocation.lat, userLocation.lng]} icon={userLocationIcon}>
+            <Popup>
+              <div className="p-1 min-w-[120px]">
+                <span className="text-[10px] font-black uppercase text-blue-600">📍 Live GPS</span>
+                <h4 className="font-bold text-xs text-[#0B2545] mt-0.5">You Are Here</h4>
+              </div>
+            </Popup>
+          </Marker>
+        )}
 
         {validStops.map((stop, idx) => (
           <Marker
@@ -120,8 +169,9 @@ export default function MapView({ stops = [], center, height = '350px', zoom = 1
         )}
       </MapContainer>
 
-      <div className="absolute bottom-2 left-2 z-[1000] bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-slate-200 text-[10px] text-slate-600 font-medium shadow-sm">
-        Approximate route view &bull; OpenStreetMap
+      <div className="absolute bottom-2 left-2 z-[1000] bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-slate-200 text-[10px] text-slate-600 font-medium shadow-sm flex items-center gap-2">
+        <span>Approximate route view &bull; OpenStreetMap</span>
+        {userLocation && <span className="text-blue-600 font-bold flex items-center gap-1"><Navigation size={10} /> GPS Active</span>}
       </div>
     </div>
   );

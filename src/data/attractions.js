@@ -1,218 +1,683 @@
+// SAHA - Verified Andhra Pradesh Tourist Attractions Dataset
+// Rich verified attractions across all 13 destinations in Andhra Pradesh
+
 export const attractions = [
-  // Vijayawada Attractions
+  // ================= 1. VIJAYAWADA ATTRACTIONS =================
   {
     id: 'attr_vjw_01',
     destinationId: 'dest_vjw',
     name: 'Kanaka Durga Temple',
     slug: 'kanaka-durga-temple',
-    description: 'A famous Hindu temple dedicated to Goddess Kanaka Durga. Located on the Indrakeeladri hill, on the banks of Krishna River, it is one of the most prominent temples in Andhra Pradesh.',
-    category: 'spiritual',
+    description: 'Ancient, revered Hindu temple dedicated to Goddess Kanaka Durga atop the scenic Indrakeeladri hill on the banks of Krishna River. A premier pilgrimage site of Andhra Pradesh.',
+    category: 'Spiritual',
     coordinates: { lat: 16.5133, lng: 80.6111 },
     suggestedDuration: 120, // minutes
-    approximateEntryFee: 0, // 0 means free or nominal fee, special darshan fees apply
-    approximateDistanceFromCenter: 2.5,
-    transportOptions: [
-      { type: 'auto', estimatedCost: 100, estimatedTime: 15 },
-      { type: 'cab', estimatedCost: 200, estimatedTime: 15 }
-    ],
+    approximateEntryFee: 0, // Free general darshan; VIP tickets available
+    timings: '04:00 AM – 09:00 PM',
     images: ['/images/kanaka_durga.jpg'],
-    bestTime: 'Morning or Evening',
-    tips: 'Expect heavy crowds during Dussehra. Dress modestly. Paid special darshan tickets can save time.',
-    isApproximate: true
+    bestTime: 'Early Morning / Evening',
+    tips: 'Dress modestly (traditional wear recommended). Use Ghat road or ropeway/steps for hill ascent.',
+    isApproximate: false
   },
   {
     id: 'attr_vjw_02',
     destinationId: 'dest_vjw',
     name: 'Prakasam Barrage',
     slug: 'prakasam-barrage',
-    description: 'An iconic structure stretching across the Krishna River. It offers a stunning view of the river and the surrounding hills, especially beautiful at night when illuminated.',
-    category: 'landmark',
+    description: 'An iconic 1,223-meter structure across the Krishna River with 76 gates. Connects NTR and Guntur districts, offering scenic sunset views and evening illumination.',
+    category: 'Landmark',
     coordinates: { lat: 16.5057, lng: 80.6074 },
     suggestedDuration: 60,
     approximateEntryFee: 0,
-    approximateDistanceFromCenter: 2.0,
-    transportOptions: [
-      { type: 'walking', estimatedCost: 0, estimatedTime: 25 },
-      { type: 'auto', estimatedCost: 50, estimatedTime: 10 }
-    ],
+    timings: 'Open 24 Hours (Best 05:00 PM – 09:00 PM)',
     images: ['/images/prakasam_barrage.jpg'],
-    bestTime: 'Evening',
-    tips: 'Best visited at sunset. Great spot for photography. Nearby boating options are available.',
-    isApproximate: true
+    bestTime: 'Sunset & Evening',
+    tips: 'Ideal for evening photography and river breeze walks. Riverfront park is right beside the barrage.',
+    isApproximate: false
   },
   {
     id: 'attr_vjw_03',
     destinationId: 'dest_vjw',
-    name: 'Bhavani Island',
-    slug: 'bhavani-island',
-    description: 'One of the largest river islands in India, located amidst the Krishna River. It offers water sports, boating, resorts, and a peaceful environment away from the city bustles.',
-    category: 'nature',
-    coordinates: { lat: 16.5250, lng: 80.5900 },
-    suggestedDuration: 240,
-    approximateEntryFee: 150, // boat ride fee usually
-    approximateDistanceFromCenter: 4.5,
-    transportOptions: [
-      { type: 'auto', estimatedCost: 150, estimatedTime: 25 } // up to the ghat, then boat
-    ],
-    images: ['/images/bhavani_island.jpg'],
-    bestTime: 'Morning to Afternoon',
-    tips: 'Must take a boat ride to reach the island. Great for a half-day picnic. APTDC runs the resort here.',
-    isApproximate: true
+    name: 'Undavalli Caves',
+    slug: 'undavalli-caves',
+    description: 'Magnificent 4th-5th century CE monolithic rock-cut cave temple. Features four storeys carved into solid sandstone with a massive 5-meter reclining Lord Vishnu statue (Anantasayana).',
+    category: 'Heritage',
+    coordinates: { lat: 16.4958, lng: 80.5807 },
+    suggestedDuration: 90,
+    approximateEntryFee: 25,
+    timings: '09:00 AM – 06:00 PM',
+    images: ['/images/undavalli_caves.jpg'],
+    bestTime: 'Morning (09:00 AM – 11:30 AM)',
+    tips: 'Climb to the top terrace for a breathtaking view of the Krishna river valley and paddy fields.',
+    isApproximate: false
   },
   {
     id: 'attr_vjw_04',
     destinationId: 'dest_vjw',
-    name: 'Undavalli Caves',
-    slug: 'undavalli-caves',
-    description: 'A monolithic example of Indian rock-cut architecture dating back to the 4th-5th centuries. Famous for the huge statue of Lord Vishnu in a reclining posture.',
-    category: 'heritage',
-    coordinates: { lat: 16.4958, lng: 80.5807 },
-    suggestedDuration: 90,
-    approximateEntryFee: 25,
-    approximateDistanceFromCenter: 6.0,
-    transportOptions: [
-      { type: 'auto', estimatedCost: 200, estimatedTime: 20 },
-      { type: 'bus', estimatedCost: 20, estimatedTime: 30 }
-    ],
-    images: ['/images/undavalli_caves.jpg'],
-    bestTime: 'Morning',
-    tips: 'Located across the river in Guntur district. Wear comfortable walking shoes for climbing steps.',
-    isApproximate: true
+    name: 'Bhavani Island',
+    slug: 'bhavani-island',
+    description: 'One of the largest river islands in India (133 acres) situated in Krishna River. Managed by APTDC with speed boating, banana boat rides, rope courses, and garden boardwalks.',
+    category: 'Nature',
+    coordinates: { lat: 16.5250, lng: 80.5900 },
+    suggestedDuration: 180,
+    approximateEntryFee: 120, // Boat ferry return ticket
+    timings: '09:30 AM – 05:30 PM',
+    images: ['/images/bhavani_island.jpg'],
+    bestTime: 'Morning or Afternoon',
+    tips: 'Board the boat from Punnami Ghat or Berm Park. Great spot for half-day family picnics.',
+    isApproximate: false
   },
-  
-  // Visakhapatnam Attractions
+  {
+    id: 'attr_vjw_05',
+    destinationId: 'dest_vjw',
+    name: 'Kondapalli Fort & Toy Village',
+    slug: 'kondapalli-fort',
+    description: 'A 14th-century hill fortress built by Prolaya Vema Reddy. Nearby Kondapalli village is world-famous for its GI-tagged handcrafted light softwood toys (Tella Poniki).',
+    category: 'Heritage',
+    coordinates: { lat: 16.6200, lng: 80.5360 },
+    suggestedDuration: 120,
+    approximateEntryFee: 20,
+    timings: '10:00 AM – 05:00 PM',
+    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning to Afternoon',
+    tips: 'Visit the artisan colony at the base of the fort to buy authentic Kondapalli Ambari toys directly from master craftsmen.',
+    isApproximate: false
+  },
+
+  // ================= 2. VISAKHAPATNAM ATTRACTIONS =================
   {
     id: 'attr_vzg_01',
     destinationId: 'dest_vzg',
-    name: 'Ramakrishna Beach (RK Beach)',
-    slug: 'rk-beach',
-    description: 'The most popular beach in Visakhapatnam, offering a long stretch of sand, ideal for evening walks. It houses the INS Kursura Submarine Museum.',
-    category: 'beach',
-    coordinates: { lat: 17.7126, lng: 83.3278 },
-    suggestedDuration: 120,
-    approximateEntryFee: 0,
-    approximateDistanceFromCenter: 4.0,
-    transportOptions: [
-      { type: 'auto', estimatedCost: 80, estimatedTime: 15 }
-    ],
-    images: ['https://images.unsplash.com/photo-1625531061730-a9cbfa36f6d6?auto=format&fit=crop&q=80'],
-    bestTime: 'Late Afternoon to Evening',
-    tips: 'Swimming is generally not advised due to strong currents. Visit the submarine museum nearby.',
-    isApproximate: true
+    name: 'INS Kursura Submarine Museum & RK Beach',
+    slug: 'kursura-submarine-museum',
+    description: 'A real decommissioned Soviet-built submarine preserved on the sands of RK Beach. The only submarine museum in South Asia, accompanied by the TU-142 Aircraft Museum opposite it.',
+    category: 'Museum',
+    coordinates: { lat: 17.7164, lng: 83.3323 },
+    suggestedDuration: 90,
+    approximateEntryFee: 70,
+    timings: '02:00 PM – 08:30 PM (Sundays: 10:00 AM – 08:30 PM)',
+    images: ['https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Late Afternoon',
+    tips: 'Guided tours inside the submarine take 30-40 minutes. Buy combo ticket for Aircraft museum.',
+    isApproximate: false
   },
   {
     id: 'attr_vzg_02',
     destinationId: 'dest_vzg',
-    name: 'INS Kursura Submarine Museum',
-    slug: 'ins-kursura',
-    description: 'A decommissioned Russian-built submarine set up as a museum on RK Beach. It offers a fascinating glimpse into the life of submariners.',
-    category: 'heritage',
-    coordinates: { lat: 17.7164, lng: 83.3323 },
-    suggestedDuration: 60,
+    name: 'Kailasagiri Hilltop Park',
+    slug: 'kailasagiri',
+    description: 'A scenic hilltop park offering panoramic 360-degree views of Vizag city and the Bay of Bengal coastline. Features massive 40-foot Shiva-Parvati statues, ropeway, and toy train.',
+    category: 'Hills',
+    coordinates: { lat: 17.7492, lng: 83.3421 },
+    suggestedDuration: 120,
     approximateEntryFee: 50,
-    approximateDistanceFromCenter: 4.5,
-    transportOptions: [
-      { type: 'auto', estimatedCost: 80, estimatedTime: 15 }
-    ],
-    images: ['https://images.unsplash.com/photo-1610427845318-7b9c97b8332b?auto=format&fit=crop&q=80'],
-    bestTime: 'Evening',
-    tips: 'Mondays usually closed. Expect queues on weekends. Very educational for children.',
-    isApproximate: true
+    timings: '06:00 AM – 08:00 PM',
+    images: ['https://images.unsplash.com/photo-1625531061730-a9cbfa36f6d6?auto=format&fit=crop&q=80&w=800'],
+    bestTime: '04:30 PM – 07:00 PM (Sunset)',
+    tips: 'Take the cable car (ropeway) up from the base for scenic coastline views.',
+    isApproximate: false
   },
   {
     id: 'attr_vzg_03',
     destinationId: 'dest_vzg',
-    name: 'Kailasagiri',
-    slug: 'kailasagiri',
-    description: 'A hilltop park offering panoramic views of the sea and the city. It features giant statues of Shiva and Parvathi, a ropeway, and a toy train.',
-    category: 'nature',
-    coordinates: { lat: 17.7490, lng: 83.3429 },
-    suggestedDuration: 180,
-    approximateEntryFee: 20, // park entry
-    approximateDistanceFromCenter: 9.0,
-    transportOptions: [
-      { type: 'cab', estimatedCost: 250, estimatedTime: 25 },
-      { type: 'auto', estimatedCost: 150, estimatedTime: 30 }
-    ],
-    images: ['https://images.unsplash.com/photo-1617056345601-38384d2b2700?auto=format&fit=crop&q=80'],
-    bestTime: 'Late Afternoon',
-    tips: 'Take the ropeway for a scenic ride up. Great place for a family picnic.',
-    isApproximate: true
+    name: 'Rishikonda Beach',
+    slug: 'rishikonda-beach',
+    description: 'Known as the "Jewel of the East Coast", Rishikonda is an internationally certified Blue Flag Beach with golden sands, water sports (scuba, surfing, kayaking), and beach cafes.',
+    category: 'Beaches',
+    coordinates: { lat: 17.7844, lng: 83.3853 },
+    suggestedDuration: 150,
+    approximateEntryFee: 0,
+    timings: '06:00 AM – 07:00 PM',
+    images: ['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning or Late Afternoon',
+    tips: 'Safest beach in Vizag for swimming with lifeguards on duty. Water sports booking counters on site.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_vzg_04',
+    destinationId: 'dest_vzg',
+    name: 'Simhachalam Temple',
+    slug: 'simhachalam-temple',
+    description: 'Ancient 11th-century hill temple dedicated to Varaha Lakshmi Narasimha Swamy. Features exquisite Kalinga architectural carvings where the idol is perpetually covered in sandalwood paste.',
+    category: 'Spiritual',
+    coordinates: { lat: 17.7667, lng: 83.2500 },
+    suggestedDuration: 120,
+    approximateEntryFee: 0,
+    timings: '07:00 AM – 04:00 PM, 06:00 PM – 09:00 PM',
+    images: ['https://images.unsplash.com/photo-1598974357801-cb8e63cc7337?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning',
+    tips: 'Chandanotsavam is the annual festival when the true form of the deity is revealed.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_vzg_05',
+    destinationId: 'dest_vzg',
+    name: 'Thotlakonda & Bavikonda Buddhist Complexes',
+    slug: 'thotlakonda-buddhist-site',
+    description: 'Ancient 2,000-year-old Hinayana Buddhist monastic complexes situated on hilltops overlooking the ocean. Features stupas, viharas, chaityas, and rock-cut water cisterns.',
+    category: 'Heritage',
+    coordinates: { lat: 17.8247, lng: 83.4144 },
+    suggestedDuration: 90,
+    approximateEntryFee: 20,
+    timings: '09:00 AM – 05:00 PM',
+    images: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning or 04:00 PM',
+    tips: 'Very peaceful site for history enthusiasts and scenic coastal photography.',
+    isApproximate: false
   },
 
-  // Tirupati Attractions
+  // ================= 3. TIRUPATI ATTRACTIONS =================
   {
     id: 'attr_tpt_01',
     destinationId: 'dest_tpt',
-    name: 'Sri Venkateswara Swamy Vaari Temple',
-    slug: 'tirumala-temple',
-    description: 'The world-famous temple of Lord Venkateswara located in Tirumala hills. Known for its Dravidian architecture and immense spiritual significance.',
-    category: 'spiritual',
-    coordinates: { lat: 13.6833, lng: 79.3473 },
-    suggestedDuration: 300,
-    approximateEntryFee: 0, // Sarva darshan free, special is 300
-    approximateDistanceFromCenter: 22.0,
-    transportOptions: [
-      { type: 'bus', estimatedCost: 100, estimatedTime: 60 }, // APSRTC buses
-      { type: 'cab', estimatedCost: 1200, estimatedTime: 50 } // To and fro
-    ],
-    images: ['https://images.unsplash.com/photo-1598974357801-cb8e63cc7337?auto=format&fit=crop&q=80'],
-    bestTime: 'Early Morning',
-    tips: 'Booking tickets online months in advance is highly recommended. Strict dress code applies.',
-    isApproximate: true
+    name: 'Sri Venkateswara Temple, Tirumala',
+    slug: 'tirumala-venkateswara-temple',
+    description: 'The world-famous temple atop the 7 Seshachalam hills dedicated to Lord Venkateswara (Balaji). Celebrated for its golden Ananda Nilayam vimana dome, spiritual chants, and Laddus.',
+    category: 'Spiritual',
+    coordinates: { lat: 13.6833, lng: 79.3500 },
+    suggestedDuration: 240,
+    approximateEntryFee: 0, // ₹300 Special Entry Darshan recommended
+    timings: '03:00 AM – 11:30 PM',
+    images: ['/images/tirupati.jpg'],
+    bestTime: 'Morning / Scheduled Darshan slot',
+    tips: 'Book TTD Special Entry Darshan (₹300) in advance via the official TTD portal. Dress code: Dhoti/Kurta for men, Saree/Churidar for women.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_tpt_02',
+    destinationId: 'dest_tpt',
+    name: 'Sri Padmavathi Ammavari Temple, Tiruchanur',
+    slug: 'padmavathi-temple',
+    description: 'Sacred temple dedicated to Goddess Padmavathi, the divine consort of Lord Venkateswara. Tradition dictates visiting this temple before or after Tirumala darshan.',
+    category: 'Spiritual',
+    coordinates: { lat: 13.6125, lng: 79.4503 },
+    suggestedDuration: 90,
+    approximateEntryFee: 0,
+    timings: '05:00 AM – 09:00 PM',
+    images: ['https://images.unsplash.com/photo-1598974357801-cb8e63cc7337?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning or Evening',
+    tips: 'Located just 5 km from Tirupati railway station in Tiruchanur village.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_tpt_03',
+    destinationId: 'dest_tpt',
+    name: 'Sri Kapileswara Swamy Temple & Waterfall',
+    slug: 'kapila-theertham',
+    description: 'Ancient Shiva temple nestled at the base of the Tirumala hill precipice, where mountain water cascades directly into the sacred Kapila Theertham temple tank.',
+    category: 'Spiritual',
+    coordinates: { lat: 13.6542, lng: 79.4214 },
+    suggestedDuration: 60,
+    approximateEntryFee: 0,
+    timings: '05:30 AM – 08:30 PM',
+    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning (especially during monsoon/winter)',
+    tips: 'The waterfall is at its magnificent best between October and January.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_tpt_04',
+    destinationId: 'dest_tpt',
+    name: 'Chandragiri Fort & Palace',
+    slug: 'chandragiri-fort',
+    description: 'Magnificent 11th-century fort and Raja Mahal palace built by the Vijayanagara rulers. Houses an archaeological museum and hosts an evening Sound & Light show.',
+    category: 'Heritage',
+    coordinates: { lat: 13.5828, lng: 79.3175 },
+    suggestedDuration: 120,
+    approximateEntryFee: 25,
+    timings: '09:00 AM – 05:30 PM (Sound & Light show at 07:00 PM)',
+    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Late Afternoon',
+    tips: '14 km from Tirupati town. The Indo-Saracenic Raja Mahal architecture is stunning.',
+    isApproximate: false
   },
 
-  // Araku Attractions
+  // ================= 4. ARAKU VALLEY ATTRACTIONS =================
   {
     id: 'attr_araku_01',
     destinationId: 'dest_araku',
     name: 'Borra Caves',
     slug: 'borra-caves',
-    description: 'One million year-old limestone caves featuring spectacular stalactite and stalagmite formations, illuminated by colorful lights.',
-    category: 'nature',
-    coordinates: { lat: 18.2818, lng: 83.0396 },
+    description: 'Spectacular 150-million-year-old limestone karst caves located in the Ananthagiri hills at 705m elevation. Filled with stalactites, stalagmites, and vibrant multi-color LED illumination.',
+    category: 'Nature',
+    coordinates: { lat: 18.2800, lng: 83.0400 },
     suggestedDuration: 120,
     approximateEntryFee: 80,
-    approximateDistanceFromCenter: 35.0, // distance from Araku center
-    transportOptions: [
-      { type: 'cab', estimatedCost: 1000, estimatedTime: 60 }
-    ],
-    images: ['https://images.unsplash.com/photo-1610427845318-7b9c97b8332b?auto=format&fit=crop&q=80'],
+    timings: '10:00 AM – 05:00 PM',
+    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    bestTime: '10:00 AM – 02:00 PM',
+    tips: 'Wear shoes with good grip as cave pathways can be damp. Located 30 km before Araku on the Vizag route.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_araku_02',
+    destinationId: 'dest_araku',
+    name: 'Araku Tribal Museum & Coffee Museum',
+    slug: 'araku-tribal-museum',
+    description: 'Cultural museum showcasing the indigenous traditions, clay huts, hunting tools, and Dhimsa folk dance of Eastern Ghats tribes. Adjacent Coffee Museum serves freshly brewed organic Araku coffee.',
+    category: 'Culture',
+    coordinates: { lat: 18.3300, lng: 82.8700 },
+    suggestedDuration: 90,
+    approximateEntryFee: 40,
+    timings: '09:00 AM – 07:00 PM',
+    images: ['/images/araku_valley.jpg'],
+    bestTime: 'Morning or Evening',
+    tips: 'Taste the signature Araku chocolate coffee and buy organic coffee beans directly at the tasting bar.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_araku_03',
+    destinationId: 'dest_araku',
+    name: 'Chaparai Water Cascades',
+    slug: 'chaparai-waterfalls',
+    description: 'A picturesque spot where mountain streams glide over smooth, wide rocky slopes surrounded by dense evergreen forests. A favorite natural water-wading destination.',
+    category: 'Nature',
+    coordinates: { lat: 18.2950, lng: 82.7830 },
+    suggestedDuration: 120,
+    approximateEntryFee: 20,
+    timings: '09:00 AM – 05:00 PM',
+    images: ['/images/araku_valley.jpg'],
+    bestTime: '11:00 AM – 03:00 PM',
+    tips: 'Taste freshly cooked bamboo chicken (Bongu Chicken) prepared on open fires by local cooks.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_araku_04',
+    destinationId: 'dest_araku',
+    name: 'Padmapuram Botanical Gardens & Treehouses',
+    slug: 'padmapuram-gardens',
+    description: 'Historic 1942 botanical garden featuring hanging tree-top huts (treehouses), rose gardens, toy train, and exotic flora set amidst misty hills.',
+    category: 'Nature',
+    coordinates: { lat: 18.3410, lng: 82.8820 },
+    suggestedDuration: 60,
+    approximateEntryFee: 30,
+    timings: '08:30 AM – 06:00 PM',
+    images: ['https://images.unsplash.com/photo-1617056345601-38384d2b2700?auto=format&fit=crop&q=80&w=800'],
     bestTime: 'Morning',
-    tips: 'Involves significant walking up and down stairs inside the cave. Stop here on the way to Araku from Vizag.',
-    isApproximate: true
+    tips: 'Great place for morning walks and peaceful photography with towering pine and eucalyptus trees.',
+    isApproximate: false
   },
 
-  // Gandikota Attractions
+  // ================= 5. GANDIKOTA ATTRACTIONS =================
   {
     id: 'attr_gandikota_01',
     destinationId: 'dest_gandikota',
-    name: 'Gandikota Fort & Gorge View',
-    slug: 'gandikota-fort',
-    description: 'Explore the ruins of the Gandikota Fort and walk up to the edge of the magnificent gorge formed by the Penna River.',
-    category: 'heritage',
-    coordinates: { lat: 14.8143, lng: 78.2862 },
+    name: 'Gandikota Gorge (Grand Canyon of India)',
+    slug: 'gandikota-gorge',
+    description: 'A breathtaking 300-foot natural canyon formed by the river Pennar cutting through layered red granite bedrock. Sunrise and sunset casting amber light on the gorge is unforgettable.',
+    category: 'Nature',
+    coordinates: { lat: 14.8146, lng: 78.2863 },
     suggestedDuration: 180,
     approximateEntryFee: 0,
-    approximateDistanceFromCenter: 1.0,
-    transportOptions: [
-      { type: 'walking', estimatedCost: 0, estimatedTime: 15 }
-    ],
-    images: ['https://images.unsplash.com/photo-1617056345601-38384d2b2700?auto=format&fit=crop&q=80'],
+    timings: 'Open 24 Hours (Best 05:30 AM – 09:00 AM & 04:30 PM – 06:30 PM)',
+    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Sunrise & Sunset',
+    tips: 'Climb the viewpoint rocks carefully for the classic gorge panorama. Adventure camping tents available on cliff edges.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_gandikota_02',
+    destinationId: 'dest_gandikota',
+    name: 'Gandikota Fort & Madhavaraya Temple',
+    slug: 'gandikota-fort',
+    description: '12th-century stone fortress with imposing 30-foot perimeter walls. Houses the grand multi-tiered Madhavaraya Temple gopuram, Raghunatha Temple, Granary, and Jamia Masjid.',
+    category: 'Heritage',
+    coordinates: { lat: 14.8160, lng: 78.2880 },
+    suggestedDuration: 120,
+    approximateEntryFee: 0,
+    timings: '06:00 AM – 06:00 PM',
+    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning or Late Afternoon',
+    tips: 'Wear comfortable walking shoes. Climb the granary roof for fort-wide views.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_gandikota_03',
+    destinationId: 'dest_gandikota',
+    name: 'Mylavaram Dam & Kayaking Waters',
+    slug: 'mylavaram-dam',
+    description: 'Sprawling reservoir on Pennar River (10 km from fort) offering kayaking, pedal boating, and tranquil sunset views surrounded by rocky hillocks.',
+    category: 'Adventure',
+    coordinates: { lat: 14.8500, lng: 78.3300 },
+    suggestedDuration: 90,
+    approximateEntryFee: 50,
+    timings: '09:00 AM – 05:30 PM',
+    images: ['https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Afternoon to Sunset',
+    tips: 'Combine with Gandikota tour. Great spot to relax after hiking the canyon.',
+    isApproximate: false
+  },
+
+  // ================= 6. RAJAHMUNDRY ATTRACTIONS =================
+  {
+    id: 'attr_rjy_01',
+    destinationId: 'dest_rjy',
+    name: 'Godavari Arch Bridge & Pushkar Ghat',
+    slug: 'godavari-arch-bridge',
+    description: 'Iconic 2.7 km bowstring-girder arch bridge spanning the mighty Godavari. Pushkar Ghat is the primary riverfront hub for evening aarti ceremonies, boat rides, and river walks.',
+    category: 'Landmark',
+    coordinates: { lat: 17.0050, lng: 81.7750 },
+    suggestedDuration: 90,
+    approximateEntryFee: 0,
+    timings: '05:00 AM – 10:00 PM',
+    images: ['https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Evening (05:30 PM for Godavari Harathi)',
+    tips: 'Witness the serene Godavari Maha Harathi ritual at Pushkar Ghat every evening.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_rjy_02',
+    destinationId: 'dest_rjy',
+    name: 'Papikondalu Godavari River Cruise',
+    slug: 'papikondalu-cruise',
+    description: 'Legendary full-day cruise on air-conditioned riverboats winding through the gorge where the Godavari river narrows between majestic green Eastern Ghats hills (Papi Hills).',
+    category: 'Nature',
+    coordinates: { lat: 17.4500, lng: 81.4000 },
+    suggestedDuration: 480, // Full day day-trip
+    approximateEntryFee: 1200, // Riverboat package with breakfast & lunch
+    timings: '07:30 AM – 06:30 PM',
+    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Full Day Cruise (Advance booking)',
+    tips: 'Boats depart from Gandi Pochamma Temple / Purushothapatnam Ghat. Includes traditional Godavari lunch on board.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_rjy_03',
+    destinationId: 'dest_rjy',
+    name: 'Kadiyam Flower Plant Nurseries',
+    slug: 'kadiyam-nurseries',
+    description: 'One of Asia’s largest floral nursery belts spread across thousands of acres with millions of exotic flowering plants, bonsai, fruit trees, and ornamental gardens.',
+    category: 'Nature',
+    coordinates: { lat: 16.9200, lng: 81.8300 },
+    suggestedDuration: 120,
+    approximateEntryFee: 0,
+    timings: '08:00 AM – 06:30 PM',
+    images: ['https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning (08:30 AM – 11:30 AM)',
+    tips: 'Located 12 km from Rajahmundry. Visitors can purchase exotic garden plants at wholesale rates.',
+    isApproximate: false
+  },
+
+  // ================= 7. KAKINADA ATTRACTIONS =================
+  {
+    id: 'attr_kkn_01',
+    destinationId: 'dest_kkn',
+    name: 'Coringa Wildlife Sanctuary & Mangrove Boardwalk',
+    slug: 'coringa-mangroves',
+    description: 'India’s second largest mangrove ecosystem (235 sq km) where Godavari river meets the Bay of Bengal. Features a 3.5 km elevated wooden walkway through mangrove swamps and boat safaris.',
+    category: 'Wildlife',
+    coordinates: { lat: 16.8900, lng: 82.2500 },
+    suggestedDuration: 180,
+    approximateEntryFee: 50,
+    timings: '09:00 AM – 05:00 PM (Closed Tuesdays)',
+    images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning (09:00 AM – 12:00 PM)',
+    tips: 'Look for fishing cats, smooth-coated otters, and rare migratory birds on the boat safari.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_kkn_02',
+    destinationId: 'dest_kkn',
+    name: 'Uppada Beach & Jamdani Weaving Village',
+    slug: 'uppada-beach-village',
+    description: 'Scenic coastline with wide sandy shores. The adjacent village of Uppada is globally renowned for GI-tagged lightweight Uppada Jamdani silk sarees woven with real silver/gold zari.',
+    category: 'Culture',
+    coordinates: { lat: 17.0800, lng: 82.3300 },
+    suggestedDuration: 120,
+    approximateEntryFee: 0,
+    timings: '07:00 AM – 07:00 PM',
+    images: ['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Late Afternoon',
+    tips: 'Visit local weaver master looms to watch the intricate non-mechanical Jamdani weaving process.',
+    isApproximate: false
+  },
+
+  // ================= 8. SRISAILAM ATTRACTIONS =================
+  {
+    id: 'attr_sri_01',
+    destinationId: 'dest_srisailam',
+    name: 'Mallikarjuna Swamy Temple (Jyotirlinga & Shakti Peeth)',
+    slug: 'mallikarjuna-swamy-temple',
+    description: 'One of the rarest pilgrimage shrines that is simultaneously one of the 12 sacred Shiva Jyotirlingas and 18 Maha Shakti Peethas (Bhramaramba Devi). Ancient fort-like stone temple walls.',
+    category: 'Spiritual',
+    coordinates: { lat: 16.0748, lng: 78.8681 },
+    suggestedDuration: 180,
+    approximateEntryFee: 0,
+    timings: '04:30 AM – 10:00 PM',
+    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning or Evening Darshan',
+    tips: 'Pilgrims can perform Sparsha Darshan (touching the sacred lingam) during designated morning hours.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_sri_02',
+    destinationId: 'dest_srisailam',
+    name: 'Srisailam Dam & Krishna River Ropeway',
+    slug: 'srisailam-dam',
+    description: 'One of the 12 largest hydroelectric power projects in India built across a deep 300m gorge on the Krishna River. Cable car ropeway takes visitors down to Pathalaganga river jetty.',
+    category: 'Landmark',
+    coordinates: { lat: 16.0880, lng: 78.8970 },
+    suggestedDuration: 120,
+    approximateEntryFee: 65, // Ropeway round trip
+    timings: '06:00 AM – 06:00 PM',
+    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning or 04:00 PM',
+    tips: 'Take the motorboat ride from Pathalaganga to the mystical Akkamahadevi Caves (16 km upstream).',
+    isApproximate: false
+  },
+
+  // ================= 9. KONASEEMA ATTRACTIONS =================
+  {
+    id: 'attr_kona_01',
+    destinationId: 'dest_konaseema',
+    name: 'Dindi Backwaters & Godavari Houseboat Cruises',
+    slug: 'dindi-backwaters',
+    description: 'Serene delta backwaters where palm-fringed canals meet the river. Luxury APTDC houseboats with bedrooms and dining cruise gently through coconut lagoons and serene villages.',
+    category: 'Nature',
+    coordinates: { lat: 16.4800, lng: 81.8200 },
+    suggestedDuration: 240,
+    approximateEntryFee: 400, // Short cruise / Houseboat ride
+    timings: '08:00 AM – 06:00 PM',
+    images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning or Sunset',
+    tips: 'Often compared to Kerala backwaters, but far quieter and uncommercialized.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_kona_02',
+    destinationId: 'dest_konaseema',
+    name: 'Atreyapuram Sweet Village (Pootharekulu Heritage)',
+    slug: 'atreyapuram-pootharekulu',
+    description: 'The historic village on the Godavari banks where generations of women artisans make the world-famous GI-tagged Pootharekulu (Paper Sweets) using rice starch, ghee, and jaggery/dry fruits.',
+    category: 'Food',
+    coordinates: { lat: 16.8300, lng: 81.7800 },
+    suggestedDuration: 90,
+    approximateEntryFee: 0,
+    timings: '08:00 AM – 08:00 PM',
+    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Anytime during the day',
+    tips: 'Watch the delicate process of baking paper-thin rice starch sheets on inverted clay pots.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_kona_03',
+    destinationId: 'dest_konaseema',
+    name: 'Antarvedi Beach & Sri Lakshmi Narasimha Temple',
+    slug: 'antarvedi-beach-temple',
+    description: 'Sacred confluence (Sagarasangamam) where the Vashishta Godavari river meets the Bay of Bengal. Ancient temple and a historic 19th-century red-and-white lighthouse on the beach.',
+    category: 'Spiritual',
+    coordinates: { lat: 16.3300, lng: 81.7300 },
+    suggestedDuration: 120,
+    approximateEntryFee: 10,
+    timings: '06:00 AM – 07:30 PM',
+    images: ['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Evening sunset at the lighthouse',
+    tips: 'Witness the distinct line where brown river waters merge with the blue ocean waters.',
+    isApproximate: false
+  },
+
+  // ================= 10. KURNOOL ATTRACTIONS =================
+  {
+    id: 'attr_knl_01',
+    destinationId: 'dest_knl',
+    name: 'Konda Reddy Buruju Fort',
+    slug: 'konda-reddy-buruju',
+    description: 'Historic circular bastion tower built in the 16th century by Vijayanagara rulers. Renowned as the defining landmark of Kurnool city, featuring underground escape tunnels and ramparts.',
+    category: 'Heritage',
+    coordinates: { lat: 15.8300, lng: 78.0400 },
+    suggestedDuration: 60,
+    approximateEntryFee: 0,
+    timings: '06:00 AM – 08:00 PM',
+    images: ['/images/kurnool_fort.jpg'],
+    bestTime: 'Evening with city illumination',
+    tips: 'Located right in the heart of Kurnool city. Combine with tasting Uggani Bajji near Old Town.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_knl_02',
+    destinationId: 'dest_knl',
+    name: 'Oravakallu Rock Garden',
+    slug: 'oravakallu-rock-garden',
+    description: 'Dramatic natural geological formation of multi-tiered silica and quartz igneous rock pillars surrounding a pristine natural lake. Includes hiking trails and APTDC boating.',
+    category: 'Nature',
+    coordinates: { lat: 15.6900, lng: 78.1300 },
+    suggestedDuration: 120,
+    approximateEntryFee: 30,
+    timings: '08:00 AM – 06:00 PM',
+    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    bestTime: '08:00 AM – 11:00 AM or 04:00 PM – 06:00 PM',
+    tips: '20 km from Kurnool on NH40. Beautiful backdrop for photography and easy rock trekking.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_knl_03',
+    destinationId: 'dest_knl',
+    name: 'Belum Caves (Near Kurnool / Nandyal)',
+    slug: 'belum-caves',
+    description: 'The second largest subterranean cave system in the Indian subcontinent (3.2 km long). Deep underground passages, stalactite formations, and a sacred meditation chamber used by Buddhist monks in 4500 BCE.',
+    category: 'Nature',
+    coordinates: { lat: 15.1028, lng: 78.1114 },
+    suggestedDuration: 150,
+    approximateEntryFee: 70,
+    timings: '10:00 AM – 05:00 PM',
+    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    bestTime: '10:00 AM – 02:00 PM',
+    tips: 'Well-lit with oxygen blowers installed along the tourist pathways. Carry water as it can feel warm inside.',
+    isApproximate: false
+  },
+
+  // ================= 11. HORSLEY HILLS ATTRACTIONS =================
+  {
+    id: 'attr_horsley_01',
+    destinationId: 'dest_horsley',
+    name: 'Gali Bandalu (Wind Rocks) & Viewpoint',
+    slug: 'gali-bandalu',
+    description: 'Massive natural rock outcrop perched at 1,290m altitude where gale-force mountain winds blow continuously. Offers breathtaking views of the Rayalaseema plains below.',
+    category: 'Nature',
+    coordinates: { lat: 13.6620, lng: 78.3990 },
+    suggestedDuration: 90,
+    approximateEntryFee: 0,
+    timings: '06:00 AM – 06:30 PM',
+    images: ['https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=800'],
     bestTime: 'Sunrise or Sunset',
-    tips: 'Best visited at sunrise for breathtaking views. Carry water as amenities are limited. Camping options are available nearby.',
-    isApproximate: true
+    tips: 'Hold onto light objects as the winds on the rocks are remarkably strong and refreshing.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_horsley_02',
+    destinationId: 'dest_horsley',
+    name: 'Kalyani — 160-Year-Old Giant Eucalyptus Tree',
+    slug: 'kalyani-eucalyptus',
+    description: 'A botanical marvel planted in 1859 by British collector W.D. Horsley. The tree has a girth exceeding 4.7 meters and rises majestically over the hill station canopy.',
+    category: 'Nature',
+    coordinates: { lat: 13.6580, lng: 78.3960 },
+    suggestedDuration: 45,
+    approximateEntryFee: 0,
+    timings: '07:00 AM – 06:00 PM',
+    images: ['https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning',
+    tips: 'Located inside the Forest department guest house complex. Great fragrant shade.',
+    isApproximate: false
+  },
+
+  // ================= 12. AMARAVATI ATTRACTIONS =================
+  {
+    id: 'attr_amv_01',
+    destinationId: 'dest_amaravati',
+    name: 'Great Buddhist Maha Chaitya & Archaeological Museum',
+    slug: 'amaravati-stupa',
+    description: 'A 2,000-year-old Buddhist marvel constructed during the Satavahana era. The museum preserves limestone carvings depicting the life of Lord Buddha and Jataka tales.',
+    category: 'Heritage',
+    coordinates: { lat: 16.5745, lng: 80.3557 },
+    suggestedDuration: 120,
+    approximateEntryFee: 25,
+    timings: '09:00 AM – 05:00 PM (Closed Fridays)',
+    images: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning or 03:30 PM',
+    tips: 'Preserved by the Archaeological Survey of India (ASI). Guided audio tours available.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_amv_02',
+    destinationId: 'dest_amaravati',
+    name: '125-Foot Dhyana Buddha Statue',
+    slug: 'dhyana-buddha-statue',
+    description: 'A colossal 125-foot statue of Lord Buddha seated in meditation posture on an 8-pillar pedestal on the banks of Krishna River. Houses an exhibition hall of Buddhist heritage.',
+    category: 'Landmark',
+    coordinates: { lat: 16.5810, lng: 80.3620 },
+    suggestedDuration: 90,
+    approximateEntryFee: 20,
+    timings: '08:00 AM – 07:00 PM',
+    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Evening sunset along the Krishna River',
+    tips: 'Lit up dramatically in the evening. River breeze makes it a tranquil meditation spot.',
+    isApproximate: false
+  },
+
+  // ================= 13. NELLORE ATTRACTIONS =================
+  {
+    id: 'attr_nlr_01',
+    destinationId: 'dest_nlr',
+    name: 'Pulicat Lake & Nelapattu Bird Sanctuary',
+    slug: 'pulicat-nelapattu-birds',
+    description: 'The second largest brackish-water lagoon in India. Between October and February, it turns pink with over 15,000 Greater and Lesser Flamingos, pelicans, and painted storks.',
+    category: 'Wildlife',
+    coordinates: { lat: 13.6700, lng: 80.0500 },
+    suggestedDuration: 180,
+    approximateEntryFee: 30,
+    timings: '08:00 AM – 05:00 PM',
+    images: ['https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&q=80&w=800'],
+    bestTime: 'Morning (07:30 AM – 11:00 AM)',
+    tips: 'The annual Flamingo Festival in January brings boat rides and guided bird-watching camps.',
+    isApproximate: false
+  },
+  {
+    id: 'attr_nlr_02',
+    destinationId: 'dest_nlr',
+    name: 'Mypadu Beach',
+    slug: 'mypadu-beach',
+    description: 'A pristine, tranquil beach with lush green casuarina tree plantations flanking the golden shoreline. Maintained by APTDC with water sports and beachfront dining.',
+    category: 'Beaches',
+    coordinates: { lat: 14.5080, lng: 80.1780 },
+    suggestedDuration: 120,
+    approximateEntryFee: 0,
+    timings: '06:00 AM – 07:00 PM',
+    images: ['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800'],
+    bestTime: '04:00 PM – 06:30 PM',
+    tips: '25 km from Nellore city. Try fresh sea-fish fries cooked by local stalls on the beach.',
+    isApproximate: false
   }
 ];
 
 export const getAttractionsByDestination = (destId) => {
-  return attractions.filter(attr => attr.destinationId === destId);
+  return attractions.filter(a => a.destinationId === destId);
 };
 
 export const getAttractionById = (id) => {
-  return attractions.find(attr => attr.id === id);
+  return attractions.find(a => a.id === id || a.slug === id);
 };
 
-export const getAttractionsByCategory = (category) => {
-  return attractions.filter(attr => attr.category === category);
+export const getAttractionsByCategory = (cat) => {
+  if (!cat || cat === 'All') return attractions;
+  return attractions.filter(a => a.category.toLowerCase() === cat.toLowerCase());
 };

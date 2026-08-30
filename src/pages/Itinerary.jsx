@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
-import { 
-  generateItinerary, 
-  removeStopFromItinerary, 
-  addStopToItinerary,
-  replanItinerary 
-} from '../services/itineraryService';
-import { getAttractionsByDestination } from '../data/attractions';
+import { generateItinerary } from '../services/itineraryService';
 import MapView from '../components/MapView';
-import Modal from '../components/Modal';
 import { 
   Clock, MapPin, Navigation, IndianRupee, Users, Compass, 
-  ChevronDown, ChevronUp, Share2, Bookmark, Play, Plus, Trash2, 
+  ChevronDown, ChevronUp, Share2, Bookmark, Play, Download, 
   AlertTriangle, Sparkles, Map as MapIcon, List, Check, ArrowRight,
-  Info, RefreshCw
+  Utensils, Hotel, Phone, ExternalLink, Calendar, Shield
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Itinerary() {
   const location = useLocation();
@@ -25,33 +18,34 @@ export default function Itinerary() {
 
   const [itinerary, setItinerary] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('timeline'); // timeline | map
+  const [activeDay, setActiveDay] = useState(1);
+  const [activeViewTab, setActiveViewTab] = useState('timeline'); // 'timeline' | 'map'
   const [showCostBreakdown, setShowCostBreakdown] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [savedOffline, setSavedOffline] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
 
-  const planningData = location.state?.planningData;
+  const planningData = location.state?.planningData || {
+    destinationId: 'dest_vjw',
+    days: 2,
+    travelers: 2,
+    totalBudget: 4000,
+    startTime: '09:00 AM',
+    interests: ['Heritage', 'Spiritual', 'Nature'],
+    travelStyle: 'Balanced',
+    pace: 'Balanced'
+  };
 
   useEffect(() => {
-    if (!planningData) {
-      navigate('/planner');
-      return;
-    }
-
     setLoading(true);
     try {
       const generated = generateItinerary(planningData);
       setItinerary(generated);
-      if (generated?.destination?.id) {
-        setBookmarked(isFavorite('destinations', generated.destination.id));
-      }
     } catch (error) {
       console.error('Failed to generate itinerary:', error);
     } finally {
-      setTimeout(() => setLoading(false), 600);
+      setTimeout(() => setLoading(false), 500);
     }
-  }, [location.state, navigate, isFavorite]);
+  }, [location.state]);
 
   const handleStartTrip = () => {
     if (!itinerary) return;
@@ -59,29 +53,77 @@ export default function Itinerary() {
     navigate('/my-trip');
   };
 
-  const handleRemoveStop = (idx) => {
+  // Save trip to Offline LocalStorage
+  const handleSaveOffline = () => {
     if (!itinerary) return;
-    const updated = removeStopFromItinerary(itinerary, idx);
-    setItinerary(updated);
+    try {
+      const existing = JSON.parse(localStorage.getItem('saha_offline_trips') || '[]');
+      const newTrip = {
+        ...itinerary,
+        savedAt: new Date().toISOString(),
+        id: `offline_${Date.now()}`
+      };
+      existing.unshift(newTrip);
+      localStorage.setItem('saha_offline_trips', JSON.stringify(existing));
+      setSavedOffline(true);
+      setTimeout(() => setSavedOffline(false), 3000);
+    } catch (e) {
+      console.error('Failed to save offline:', e);
+    }
   };
 
-  const handleAddAttraction = (attraction) => {
+  // Download printable / standalone offline trip file
+  const handleDownloadOfflineFile = () => {
     if (!itinerary) return;
-    const updated = addStopToItinerary(itinerary, attraction);
-    setItinerary(updated);
-    setShowAddModal(false);
+    const dest = itinerary.destination?.name || 'Andhra Pradesh';
+    let fileContent = `====================================================\n`;
+    fileContent += `  SAHA SMART LOCAL TRAVEL COMPANION — OFFLINE TRIP PLAN\n`;
+    fileContent += `  Destination: ${dest} (${itinerary.destination?.district} District)\n`;
+    fileContent += `  Duration: ${itinerary.days} Day(s) | Travelers: ${itinerary.travelers}\n`;
+    fileContent += `  Estimated Budget: ₹${itinerary.grandTotalCost} (Per person: ₹${itinerary.costPerPerson})\n`;
+    fileContent += `====================================================\n\n`;
+
+    itinerary.dailyPlans.forEach(day => {
+      fileContent += `--- DAY ${day.day}: ${day.theme} ---\n`;
+      day.stops.forEach(stop => {
+        if (stop.type === 'attraction') {
+          fileContent += `[${stop.time} – ${stop.departureTime}] 🏛️ ${stop.title}\n`;
+          fileContent += `   Category: ${stop.category} | Duration: ${stop.suggestedDurationMins} mins\n`;
+          fileContent += `   Transit from last: ${stop.travelDistanceFromPrev} km via ${stop.transportMode} (~₹${stop.transportCost})\n`;
+          fileContent += `   Entry fee: ₹${stop.entryFeePerPerson} per person\n`;
+          fileContent += `   Tip: ${stop.tips || 'Explore comfortably'}\n\n`;
+        } else if (stop.type === 'meal') {
+          fileContent += `[${stop.time} – ${stop.departureTime}] 🍛 ${stop.mealType}: ${stop.title}\n`;
+          fileContent += `   ${stop.description}\n`;
+          fileContent += `   Est. Cost: ₹${stop.costPerPerson} per person\n\n`;
+        }
+      });
+      fileContent += `\n`;
+    });
+
+    fileContent += `--- EMERGENCY CONTACTS IN ANDHRA PRADESH ---\n`;
+    fileContent += `National Emergency: 112\n`;
+    fileContent += `Ambulance & Trauma: 108\n`;
+    fileContent += `Tourist Helpline: 1363\n`;
+    fileContent += `Police: 100\n`;
+    fileContent += `Women Helpline: 1091\n\n`;
+    fileContent += `Generated by SAHA — Smart Assistance for Tourists in Andhra Pradesh\n`;
+
+    const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `SAHA_Offline_Trip_${dest.replace(/\s+/g, '_')}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleShare = () => {
     if (!itinerary) return;
-    const shareText = `SAHA Journey to ${itinerary.destination?.name || 'Destination'}: ${itinerary.stops?.length || 0} stops, ${itinerary.summary?.totalTime || ''}, Est. Cost: ${itinerary.summary?.estimatedCost || ''}. Planned with SAHA - Your Smart Local Travel Companion.`;
-    
+    const shareText = `Check out my SAHA itinerary for ${itinerary.destination?.name}: ${itinerary.days} days, estimated ₹${itinerary.grandTotalCost}. Powered by SAHA.`;
     if (navigator.share) {
-      navigator.share({
-        title: `SAHA Journey - ${itinerary.destination?.name}`,
-        text: shareText,
-        url: window.location.href,
-      }).catch(() => {});
+      navigator.share({ title: `SAHA Itinerary - ${itinerary.destination?.name}`, text: shareText, url: window.location.href }).catch(() => {});
     } else {
       navigator.clipboard.writeText(shareText);
       setCopied(true);
@@ -89,398 +131,324 @@ export default function Itinerary() {
     }
   };
 
-  const handleToggleBookmark = () => {
-    if (!itinerary?.destination?.id) return;
-    toggleFavorite('destinations', itinerary.destination.id);
-    setBookmarked(!bookmarked);
-  };
-
-  if (loading) {
+  if (loading || !itinerary) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center px-4 pt-20">
-        <div className="relative mb-6">
-          <div className="w-16 h-16 border-4 border-[#0077B6]/20 border-t-[#0077B6] rounded-full animate-spin" />
-          <Compass className="w-6 h-6 text-[#0077B6] absolute inset-0 m-auto" />
+      <div className="min-h-screen bg-[#F7FBFC] flex flex-col items-center justify-center pt-24 px-4">
+        <div className="w-16 h-16 rounded-3xl overflow-hidden p-1 bg-white border border-teal-500/40 shadow-xl animate-bounce mb-4">
+          <img src="/logo.png" alt="SAHA" className="w-full h-full object-contain" />
         </div>
-        <h2 className="text-2xl font-bold text-[#1B2A4A] mb-2 text-center">SAHA is crafting your journey...</h2>
-        <p className="text-slate-500 text-sm max-w-md text-center">
-          Matching your budget, group size, transit distances, and interests for optimal route flow.
-        </p>
+        <h2 className="text-xl font-black text-[#0B2545]">SAHA AI is Generating Your AP Journey...</h2>
+        <p className="text-xs text-slate-500 mt-1">Optimizing routes, local food breaks, and verified stays...</p>
       </div>
     );
   }
 
-  if (!itinerary) return null;
-
-  const availableToAdd = itinerary.destination?.id
-    ? getAttractionsByDestination(itinerary.destination.id).filter(
-        a => !itinerary.stops.some(s => s.attractionId === a.id || s.name === a.name)
-      )
-    : [];
+  const currentDayPlan = itinerary.dailyPlans.find(d => d.day === activeDay) || itinerary.dailyPlans[0];
+  const attractionStops = currentDayPlan.stops.filter(s => s.type === 'attraction');
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pt-24 pb-24">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+    <div className="min-h-screen bg-[#F7FBFC] pt-24 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header Bar */}
-        <div className="mb-6 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        {/* Header Hero Banner */}
+        <div className="bg-gradient-to-r from-[#031926] via-[#0B2545] to-[#0077B6] rounded-3xl p-6 sm:p-10 text-white shadow-xl mb-8 relative overflow-hidden">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 relative z-10">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 bg-[#0077B6]/10 text-[#0077B6] font-bold text-xs uppercase tracking-wider rounded-md">
-                  Personalized Itinerary
-                </span>
-                <span className="text-xs text-slate-500">
-                  {itinerary.planningParams?.pace} pace &bull; {itinerary.planningParams?.travelStyle}
-                </span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/20 text-[#00A896] text-xs font-black uppercase tracking-wider mb-2 border border-teal-500/30">
+                <Sparkles size={13} /> Tailored AI Journey
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-[#1B2A4A] mt-1">
-                {itinerary.destination?.name || 'Your Trip'}
+              <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
+                {itinerary.destination.name} Explorer
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {itinerary.destination?.district}, {itinerary.destination?.state}
+              <p className="text-xs sm:text-sm text-slate-200 mt-1 flex items-center gap-2">
+                <span>📍 {itinerary.destination.district} District</span> • 
+                <span>⏱️ {itinerary.days} Day(s)</span> • 
+                <span>👥 {itinerary.travelers} Travelers</span>
               </p>
-            </div>
 
-            <div className="flex items-center space-x-2">
-              <button 
-                onClick={handleShare}
-                className="px-3.5 py-2 text-slate-600 bg-white border border-slate-200 hover:text-[#0077B6] hover:border-[#0077B6] rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm"
-              >
-                {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Share2 className="w-4 h-4" />}
-                {copied ? 'Copied!' : 'Share'}
-              </button>
-              <button 
-                onClick={handleToggleBookmark}
-                className={`p-2 rounded-xl border text-xs font-bold transition-colors shadow-sm ${
-                  bookmarked 
-                    ? 'bg-amber-50 border-amber-300 text-amber-600' 
-                    : 'bg-white border-slate-200 text-slate-600 hover:text-amber-500'
-                }`}
-                title="Save to favorites"
-              >
-                <Bookmark className={`w-4 h-4 ${bookmarked ? 'fill-current' : ''}`} />
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Metrics Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
-            <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
-              <div className="flex items-center gap-1 text-slate-400 mb-1">
-                <Clock className="w-3.5 h-3.5 text-[#00838F]" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Duration</span>
-              </div>
-              <span className="font-extrabold text-sm text-[#1B2A4A]">{itinerary.summary.totalTime}</span>
-            </div>
-
-            <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
-              <div className="flex items-center gap-1 text-slate-400 mb-1">
-                <IndianRupee className="w-3.5 h-3.5 text-[#00838F]" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Est. Cost</span>
-              </div>
-              <span className="font-extrabold text-sm text-[#1B2A4A]">{itinerary.summary.estimatedCost}</span>
-            </div>
-
-            <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
-              <div className="flex items-center gap-1 text-slate-400 mb-1">
-                <MapPin className="w-3.5 h-3.5 text-[#00838F]" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Sightseeing</span>
-              </div>
-              <span className="font-extrabold text-sm text-[#1B2A4A]">{itinerary.summary.placesCount} Stops</span>
-            </div>
-
-            <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
-              <div className="flex items-center gap-1 text-slate-400 mb-1">
-                <Navigation className="w-3.5 h-3.5 text-[#00838F]" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Distance</span>
-              </div>
-              <span className="font-extrabold text-sm text-[#1B2A4A]">{itinerary.summary.totalDistance}</span>
-            </div>
-
-            <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
-              <div className="flex items-center gap-1 text-slate-400 mb-1">
-                <Users className="w-3.5 h-3.5 text-[#00838F]" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Travelers</span>
-              </div>
-              <span className="font-extrabold text-sm text-[#1B2A4A]">{itinerary.summary.travelers}</span>
-            </div>
-
-            <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
-              <div className="flex items-center gap-1 text-slate-400 mb-1">
-                <IndianRupee className="w-3.5 h-3.5 text-[#00838F]" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Per Person</span>
-              </div>
-              <span className="font-extrabold text-xs text-[#00695C]">{itinerary.summary.costPerPerson}</span>
-            </div>
-          </div>
-
-          {/* Budget Health Banner */}
-          <div className={`p-3.5 rounded-2xl flex items-center justify-between text-xs font-bold ${
-            itinerary.summary.isWithinBudget 
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-              : 'bg-amber-50 text-amber-800 border border-amber-200'
-          }`}>
-            <div className="flex items-center gap-2">
-              {itinerary.summary.isWithinBudget ? (
-                <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              ) : (
-                <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-              )}
-              <span>
-                {itinerary.summary.isWithinBudget 
-                  ? `Plan fits within your ₹${itinerary.planningParams?.totalBudget} budget with ~₹${itinerary.summary.budgetRemaining} remaining margin.` 
-                  : `Plan slightly exceeds your ₹${itinerary.planningParams?.totalBudget} budget by ₹${Math.abs(itinerary.summary.budgetRemaining)}.`}
-              </span>
-            </div>
-            <span className="text-[11px] font-semibold text-slate-500 hidden sm:inline">
-              Approximate estimate
-            </span>
-          </div>
-        </div>
-
-        {/* View Tabs: Timeline vs Interactive Map */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex p-1 bg-slate-200/80 rounded-xl">
-            <button
-              onClick={() => setActiveTab('timeline')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                activeTab === 'timeline' ? 'bg-white shadow text-[#0077B6]' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <List className="w-3.5 h-3.5" /> Timeline View
-            </button>
-            <button
-              onClick={() => setActiveTab('map')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                activeTab === 'map' ? 'bg-white shadow text-[#0077B6]' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <MapIcon className="w-3.5 h-3.5" /> Interactive Map ({itinerary.stops.length} Stops)
-            </button>
-          </div>
-
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-3.5 py-2 text-xs font-bold text-[#0077B6] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-xl transition-colors flex items-center gap-1"
-          >
-            <Plus className="w-3.5 h-3.5" /> Add Stop
-          </button>
-        </div>
-
-        {/* Map Tab Content */}
-        {activeTab === 'map' && (
-          <div className="mb-8 space-y-4">
-            <MapView 
-              stops={itinerary.stops} 
-              center={itinerary.destination?.coordinates}
-              height="450px" 
-            />
-          </div>
-        )}
-
-        {/* Timeline Tab Content */}
-        {activeTab === 'timeline' && (
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 mb-8 relative">
-            <div className="absolute left-[36px] sm:left-[44px] top-12 bottom-12 w-0.5 bg-slate-200" />
-            
-            <div className="space-y-8">
-              {itinerary.stops.map((stop, index) => (
-                <div key={stop.id || index} className="relative z-10 flex">
-                  
-                  {/* Timeline Node & Time */}
-                  <div className="flex flex-col items-center mr-4 sm:mr-6 w-14 flex-shrink-0">
-                    <div className="w-7 h-7 rounded-full bg-[#0077B6] text-white font-black text-xs flex items-center justify-center ring-4 ring-white shadow mb-1.5">
-                      {index + 1}
-                    </div>
-                    <span className="text-[11px] font-black text-slate-600 text-center leading-tight">
-                      {stop.arrivalTime}
-                    </span>
-                  </div>
-
-                  {/* Content Card */}
-                  <div className="flex-1">
-                    {/* Transit connector badge if not first */}
-                    {stop.distanceFromPrev && (
-                      <div className="flex items-center text-xs text-slate-500 mb-3 -ml-4 sm:-ml-6 px-3 py-1 bg-sky-50 rounded-full w-max border border-sky-100 font-medium">
-                        <Navigation className="w-3 h-3 mr-1 text-[#0077B6]" />
-                        <span>{stop.distanceFromPrev} &bull; <strong>{stop.transport?.mode}</strong> (~{stop.transport?.travelTime}) &bull; {stop.transport?.estimatedCost}</span>
-                      </div>
-                    )}
-                    
-                    <div className="bg-slate-50 hover:bg-slate-100/80 transition-all rounded-2xl p-4 sm:p-5 border border-slate-200 group relative">
-                      <div className="absolute top-4 right-4 flex items-center space-x-1">
-                        <button 
-                          onClick={() => handleRemoveStop(index)}
-                          className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
-                          title="Remove stop"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-
-                      <div className="pr-10">
-                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                          <Link 
-                            to={`/destination/${itinerary.destination?.slug}`} 
-                            className="text-base sm:text-lg font-bold text-[#1B2A4A] hover:text-[#0077B6] transition-colors"
-                          >
-                            {stop.name}
-                          </Link>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1.5 mb-2.5">
-                          <span className="px-2 py-0.5 bg-white border border-slate-200 text-slate-600 text-[10px] uppercase font-bold tracking-wider rounded-md">
-                            Visit: {stop.duration}
-                          </span>
-                          {(stop.categories || []).map(cat => (
-                            <span key={cat} className="px-2 py-0.5 bg-[#0077B6]/10 text-[#0077B6] text-[10px] uppercase font-bold tracking-wider rounded-md">
-                              {cat}
-                            </span>
-                          ))}
-                        </div>
-
-                        <p className="text-xs sm:text-sm text-slate-600 mb-3 leading-relaxed">
-                          {stop.description}
-                        </p>
-                        
-                        <div className="flex flex-wrap items-center justify-between pt-3 border-t border-slate-200/80 gap-2 text-xs">
-                          <div className="text-slate-500 font-medium">
-                            Entry: <strong className="text-slate-800">{stop.entryFee}</strong> &bull; Est. Stop Subtotal: <strong className="text-[#00695C]">₹{stop.subtotal}</strong>
-                          </div>
-                          <Link 
-                            to={`/destination/${itinerary.destination?.slug}`}
-                            className="text-xs font-bold text-[#0077B6] hover:underline flex items-center gap-1"
-                          >
-                            Place Details <ArrowRight className="w-3 h-3" />
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              {/* Group Compromise Note */}
+              {itinerary.groupCompromiseNote && (
+                <div className="mt-3 p-3 bg-teal-500/20 rounded-xl border border-teal-400/40 text-xs font-bold text-teal-200">
+                  {itinerary.groupCompromiseNote}
                 </div>
+              )}
+
+              {/* Weather Alert */}
+              {itinerary.weatherAlert && (
+                <div className="mt-2 p-3 bg-amber-500/20 rounded-xl border border-amber-400/40 text-xs font-bold text-amber-200">
+                  {itinerary.weatherAlert}
+                </div>
+              )}
+            </div>
+
+            {/* Top Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={handleSaveOffline}
+                className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold border border-white/25 backdrop-blur-sm transition-all flex items-center gap-1.5"
+              >
+                {savedOffline ? <Check size={14} className="text-emerald-400" /> : <Bookmark size={14} />}
+                <span>{savedOffline ? 'Saved for Offline!' : 'Save for Offline'}</span>
+              </button>
+
+              <button
+                onClick={handleDownloadOfflineFile}
+                className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold border border-white/25 backdrop-blur-sm transition-all flex items-center gap-1.5"
+                title="Download text summary for offline view"
+              >
+                <Download size={14} />
+                <span>Download Offline</span>
+              </button>
+
+              <button
+                onClick={handleShare}
+                className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl border border-white/25 backdrop-blur-sm"
+              >
+                <Share2 size={16} />
+              </button>
+
+              <button
+                onClick={handleStartTrip}
+                className="px-6 py-2.5 bg-gradient-to-r from-[#F59E0B] to-[#E76F51] hover:from-[#D97706] hover:to-[#D46045] text-white rounded-xl text-xs font-black shadow-lg shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
+              >
+                <Play size={14} className="fill-white" /> Start This Journey
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Metrics Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-white/10 text-xs">
+            <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+              <span className="text-slate-300 text-[10px] uppercase font-bold">Total Estimated Budget</span>
+              <p className="text-base font-black text-white mt-0.5">₹{itinerary.grandTotalCost.toLocaleString()}</p>
+            </div>
+            <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+              <span className="text-slate-300 text-[10px] uppercase font-bold">Per Person Cost</span>
+              <p className="text-base font-black text-teal-300 mt-0.5">₹{itinerary.costPerPerson.toLocaleString()}</p>
+            </div>
+            <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+              <span className="text-slate-300 text-[10px] uppercase font-bold">Total Sights & Stops</span>
+              <p className="text-base font-black text-white mt-0.5">{itinerary.summary.totalStops} Attractions</p>
+            </div>
+            <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+              <span className="text-slate-300 text-[10px] uppercase font-bold">Total Distance</span>
+              <p className="text-base font-black text-white mt-0.5">~{itinerary.totalDistanceKm} km</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Multi-Day Tabs & View Toggle */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          
+          {/* Day Tabs */}
+          {itinerary.dailyPlans.length > 1 && (
+            <div className="flex flex-wrap gap-2">
+              {itinerary.dailyPlans.map(day => (
+                <button
+                  key={day.day}
+                  onClick={() => setActiveDay(day.day)}
+                  className={`px-5 py-2.5 rounded-2xl text-xs font-black transition-all ${
+                    activeDay === day.day
+                      ? 'bg-gradient-to-r from-[#0077B6] to-[#00A896] text-white shadow-md'
+                      : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
+                  }`}
+                >
+                  Day {day.day}: {day.theme.split('&')[0]}
+                </button>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Cost Breakdown Collapsible */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-          <button 
-            onClick={() => setShowCostBreakdown(!showCostBreakdown)}
-            className="w-full flex justify-between items-center p-5 bg-slate-50 hover:bg-slate-100 transition-colors"
-          >
-            <div className="flex items-center">
-              <div className="p-2 bg-[#00838F]/10 rounded-xl mr-3">
-                <IndianRupee className="w-5 h-5 text-[#00838F]" />
-              </div>
-              <div className="text-left">
-                <span className="font-bold text-sm text-[#1B2A4A] block">Transparent Cost Breakdown</span>
-                <span className="text-xs text-slate-500">All local fares & fees calculated for {itinerary.summary.travelers} traveler{itinerary.summary.travelers > 1 ? 's' : ''}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="font-extrabold text-base text-[#1B2A4A]">₹{itinerary.costBreakdown.total}</span>
-              {showCostBreakdown ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
-            </div>
-          </button>
-          
-          {showCostBreakdown && (
-            <div className="p-5 border-t border-slate-200 space-y-3 bg-white">
-              <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-slate-600">Transport Estimate (Auto/Cab/Transit)</span>
-                <span className="font-bold text-slate-800">₹{itinerary.costBreakdown.transport}</span>
-              </div>
-              <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-slate-600">Entry Fees & Tickets ({itinerary.summary.travelers} pax)</span>
-                <span className="font-bold text-slate-800">₹{itinerary.costBreakdown.entryFees}</span>
-              </div>
-              <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-slate-600">Food & Refreshments Estimate</span>
-                <span className="font-bold text-slate-800">₹{itinerary.costBreakdown.food}</span>
-              </div>
-              
-              <div className="h-px bg-slate-200 my-2" />
-              
-              <div className="flex justify-between text-sm font-extrabold text-[#1B2A4A]">
-                <span>Total Estimated Journey Cost</span>
-                <span className="text-[#0077B6]">₹{itinerary.costBreakdown.total}</span>
-              </div>
-              <div className="flex justify-between text-xs text-slate-500">
-                <span>Per Person Share</span>
-                <span className="font-semibold">{itinerary.summary.costPerPerson}</span>
-              </div>
-              <div className={`flex justify-between text-xs font-bold pt-1 ${
-                itinerary.costBreakdown.budgetRemaining >= 0 ? 'text-emerald-700' : 'text-rose-600'
-              }`}>
-                <span>Budget Remaining from ₹{itinerary.planningParams?.totalBudget}</span>
-                <span>₹{itinerary.costBreakdown.budgetRemaining}</span>
-              </div>
-
-              <p className="text-[11px] text-slate-400 italic pt-2 border-t border-slate-100">
-                Note: Fares and meal costs are approximate realistic estimates. Actual expenses may vary based on local conditions.
-              </p>
-            </div>
           )}
+
+          {/* View Mode Toggle: Timeline vs Leaflet Map */}
+          <div className="inline-flex p-1 bg-white rounded-2xl border border-slate-200 shadow-xs">
+            <button
+              onClick={() => setActiveViewTab('timeline')}
+              className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+                activeViewTab === 'timeline'
+                  ? 'bg-[#0077B6] text-white'
+                  : 'text-slate-600 hover:text-[#0077B6]'
+              }`}
+            >
+              <List size={14} /> Timeline View
+            </button>
+            <button
+              onClick={() => setActiveViewTab('map')}
+              className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+                activeViewTab === 'map'
+                  ? 'bg-[#0077B6] text-white'
+                  : 'text-slate-600 hover:text-[#0077B6]'
+              }`}
+            >
+              <MapIcon size={14} /> Map Route
+            </button>
+          </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button 
-            onClick={() => navigate('/planner', { state: { destination: itinerary.destination } })}
-            className="flex-1 py-3.5 px-4 rounded-2xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors flex justify-center items-center gap-2 text-sm shadow-sm"
-          >
-            <Compass className="w-4 h-4 text-slate-500" />
-            Modify in Planner
-          </button>
+        {/* Main Content: Timeline or Map */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          <button 
-            onClick={handleStartTrip}
-            className="flex-[2] py-3.5 px-6 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-extrabold hover:shadow-lg hover:shadow-amber-500/25 transition-all flex justify-center items-center gap-2 text-sm"
-          >
-            <Play className="w-4 h-4 fill-current" />
-            Start This Trip Now
-          </button>
+          <div className="lg:col-span-8 space-y-6">
+            
+            {activeViewTab === 'timeline' ? (
+              <div className="space-y-4">
+                {currentDayPlan.stops.map((stop, idx) => (
+                  <motion.div
+                    key={stop.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`rounded-3xl p-6 border transition-all ${
+                      stop.type === 'meal'
+                        ? 'bg-amber-50/40 border-amber-200/70'
+                        : 'bg-white border-teal-900/10 shadow-xs hover:shadow-md'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 bg-[#031926] text-teal-300 font-black text-xs rounded-xl shadow-xs">
+                          {stop.time}
+                        </span>
+                        <div>
+                          <span className={`text-[10px] font-black uppercase ${stop.type === 'meal' ? 'text-amber-700' : 'text-[#00838F]'}`}>
+                            {stop.type === 'meal' ? '🍛 Meal Break' : `🏛️ ${stop.category}`}
+                          </span>
+                          <h3 className="text-base font-black text-[#0B2545]">{stop.title}</h3>
+                        </div>
+                      </div>
+
+                      {stop.type === 'attraction' && (
+                        <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                          ⏱️ {stop.suggestedDurationMins} mins
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                      {stop.description}
+                    </p>
+
+                    {/* Metadata Footer */}
+                    <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      {stop.type === 'attraction' ? (
+                        <>
+                          <span className="text-slate-500 font-medium">
+                            🚗 {stop.travelDistanceFromPrev} km via {stop.transportMode} (~₹{stop.transportCost})
+                          </span>
+                          <span className="font-bold text-[#0B2545]">
+                            Entry: {stop.entryFeePerPerson > 0 ? `₹${stop.entryFeePerPerson}/person` : 'Free Entry'}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-amber-800 font-bold">
+                            🍴 {stop.cuisine || 'Authentic Andhra Meals'}
+                          </span>
+                          <span className="font-black text-[#0B2545]">
+                            Est: ₹{stop.costPerPerson}/person
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              /* Map View for the selected day */
+              <div className="bg-white rounded-3xl p-3 shadow-md border border-slate-200 h-[550px] overflow-hidden">
+                <MapView stops={attractionStops} center={itinerary.destination.coordinates} />
+              </div>
+            )}
+
+            {/* Recommended Hotel Card for Multi-Day Trips */}
+            {itinerary.recommendedHotel && (
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-teal-900/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center flex-shrink-0">
+                    <Hotel size={26} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">
+                      Overnight Stay Recommendation
+                    </span>
+                    <h4 className="text-base font-black text-[#0B2545] mt-1">{itinerary.recommendedHotel.name}</h4>
+                    <p className="text-xs text-slate-500">{itinerary.recommendedHotel.location} • ₹{itinerary.recommendedHotel.pricePerNight}/night</p>
+                  </div>
+                </div>
+
+                <a
+                  href={itinerary.recommendedHotel.bookingLink || '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-5 py-2.5 bg-[#0077B6] hover:bg-[#00695C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 transition-colors"
+                >
+                  Book Hotel <ExternalLink size={13} />
+                </a>
+              </div>
+            )}
+
+          </div>
+
+          {/* Right Sidebar: Cost Breakdown & Offline Guarantee */}
+          <div className="lg:col-span-4 space-y-6">
+            
+            {/* Cost Breakdown Card */}
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-teal-900/10 space-y-4">
+              <h3 className="text-base font-black text-[#0B2545] flex items-center justify-between">
+                <span>Trip Cost Breakdown</span>
+                <span className="text-xs font-black text-emerald-600">Verified Budget</span>
+              </h3>
+
+              <div className="space-y-2.5 text-xs">
+                <div className="flex justify-between text-slate-600">
+                  <span>🏛️ Entry Fees (Total Group):</span>
+                  <span className="font-bold text-[#0B2545]">₹{itinerary.summary.breakdown.entryFees}</span>
+                </div>
+                <div className="flex justify-between text-slate-600">
+                  <span>🚗 Local Transit & Auto:</span>
+                  <span className="font-bold text-[#0B2545]">₹{itinerary.summary.breakdown.transport}</span>
+                </div>
+                <div className="flex justify-between text-slate-600">
+                  <span>🍛 Meals & Dining:</span>
+                  <span className="font-bold text-[#0B2545]">₹{itinerary.summary.breakdown.food}</span>
+                </div>
+                {itinerary.summary.breakdown.accommodation > 0 && (
+                  <div className="flex justify-between text-slate-600">
+                    <span>🏨 Hotel Accommodation:</span>
+                    <span className="font-bold text-[#0B2545]">₹{itinerary.summary.breakdown.accommodation}</span>
+                  </div>
+                )}
+                <div className="pt-3 border-t border-slate-100 flex justify-between text-sm font-black text-[#0B2545]">
+                  <span>Total Journey Cost:</span>
+                  <span className="text-[#0077B6]">₹{itinerary.grandTotalCost}</span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-teal-50/70 rounded-2xl text-[11px] text-[#00838F] font-bold">
+                ✓ All costs are calculated using standard 2026 Andhra Pradesh tourism and transport tariffs.
+              </div>
+            </div>
+
+            {/* Offline Capability Box */}
+            <div className="bg-gradient-to-br from-[#031926] to-[#0B2545] text-white rounded-3xl p-6 shadow-md space-y-3">
+              <span className="text-[10px] font-black uppercase text-teal-300 bg-teal-500/20 px-2.5 py-1 rounded-md">
+                📱 Offline Travel Ready
+              </span>
+              <h4 className="text-sm font-black text-white">No Internet During Travel?</h4>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Save this journey or download the offline file. You can access all timings, restaurant names, and emergency numbers even in remote areas.
+              </p>
+              <button
+                onClick={handleSaveOffline}
+                className="w-full py-2.5 bg-gradient-to-r from-[#00A896] to-[#0077B6] hover:from-[#00838F] hover:to-[#0A3D62] text-white rounded-xl text-xs font-black transition-all shadow-sm flex items-center justify-center gap-1.5"
+              >
+                <Bookmark size={14} /> Save to My Offline Trips
+              </button>
+            </div>
+
+          </div>
+
         </div>
 
       </div>
-
-      {/* Add Attraction Modal */}
-      <Modal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        title="Add a Stop to Your Itinerary"
-      >
-        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-          {availableToAdd.length === 0 ? (
-            <p className="text-sm text-slate-500 py-4 text-center">
-              All known attractions for this destination are already in your itinerary.
-            </p>
-          ) : (
-            availableToAdd.map(attr => (
-              <div 
-                key={attr.id}
-                onClick={() => handleAddAttraction(attr)}
-                className="p-3.5 rounded-xl border border-slate-200 hover:border-[#0077B6] hover:bg-sky-50/50 cursor-pointer transition-all flex items-center justify-between gap-3"
-              >
-                <div>
-                  <h4 className="font-bold text-sm text-[#1B2A4A]">{attr.name}</h4>
-                  <p className="text-xs text-slate-500 line-clamp-1">{attr.description}</p>
-                  <div className="flex gap-2 mt-1 text-[11px] text-slate-400">
-                    <span>Visit: {attr.suggestedDuration || 60}m</span>
-                    <span>&bull;</span>
-                    <span>Entry: ₹{attr.approximateEntryFee || 0}</span>
-                  </div>
-                </div>
-                <button className="px-3 py-1.5 bg-[#0077B6] text-white font-bold text-xs rounded-lg shadow-sm whitespace-nowrap">
-                  Add +
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      </Modal>
-
     </div>
   );
 }

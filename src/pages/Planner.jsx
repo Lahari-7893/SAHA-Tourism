@@ -51,6 +51,12 @@ export default function Planner() {
     startCoords: null,
     travelers: 3,
     travelType: 'friends', // solo, couple, family, friends
+    enableGroupPreferences: true,
+    groupPreferences: [
+      { name: 'Person A', interest: 'temples' },
+      { name: 'Person B', interest: 'food' },
+      { name: 'Person C', interest: 'nature' }
+    ],
     budget: 800,
     timeType: 'hours', // hours, days
     duration: 5,
@@ -141,6 +147,7 @@ export default function Planner() {
         availableTimeHours: formData.timeType === 'hours' ? formData.duration : formData.duration * 8,
         availableTimeMinutes: formData.timeType === 'hours' ? formData.duration * 60 : formData.duration * 480,
         interests: formData.interests,
+        groupPreferences: formData.enableGroupPreferences ? formData.groupPreferences : null,
         travelStyle: formData.travelStyle,
         pace: formData.pace
       };
@@ -317,6 +324,60 @@ export default function Planner() {
               </button>
             </div>
           </div>
+
+          {/* Group Preference Compromise Feature */}
+          {formData.travelers > 1 && (
+            <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-black text-[#00838F] uppercase tracking-wider">🧑‍🤝‍🧑 Group Trip Preference Compromise</h4>
+                  <p className="text-[11px] text-slate-500">Allow SAHA to balance individual group member preferences</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={formData.enableGroupPreferences}
+                  onChange={(e) => updateForm('enableGroupPreferences', e.target.checked)}
+                  className="w-4 h-4 accent-[#0077B6] rounded cursor-pointer"
+                />
+              </div>
+
+              {formData.enableGroupPreferences && (
+                <div className="space-y-2 bg-teal-50/50 p-3 rounded-xl border border-teal-100">
+                  {formData.groupPreferences.map((pref, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-xs">
+                      <input
+                        type="text"
+                        value={pref.name}
+                        onChange={(e) => {
+                          const updated = [...formData.groupPreferences];
+                          updated[idx].name = e.target.value;
+                          updateForm('groupPreferences', updated);
+                        }}
+                        className="w-24 p-1.5 rounded-lg border border-slate-200 font-bold bg-white text-[11px]"
+                      />
+                      <span className="text-slate-400 font-semibold">prefers</span>
+                      <select
+                        value={pref.interest}
+                        onChange={(e) => {
+                          const updated = [...formData.groupPreferences];
+                          updated[idx].interest = e.target.value;
+                          updateForm('groupPreferences', updated);
+                        }}
+                        className="flex-1 p-1.5 rounded-lg border border-slate-200 font-bold bg-white text-[11px] text-[#0077B6]"
+                      >
+                        <option value="temples">Temples & Spiritual</option>
+                        <option value="food">Local Food & Cuisine</option>
+                        <option value="nature">Nature & Hills</option>
+                        <option value="heritage">Heritage & History</option>
+                        <option value="beaches">Beaches & Coastal</option>
+                        <option value="shopping">Shopping & Crafts</option>
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );

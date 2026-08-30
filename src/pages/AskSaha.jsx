@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import { processQuery } from '../services/aiService';
 import { 
-  Send, User, Bot, Sparkles, MapPin, Clock, IndianRupee, 
-  Utensils, Car, Shield, ArrowRight, Compass, Phone
+  Send, User, Sparkles, MapPin, Clock, IndianRupee, 
+  Utensils, Car, Shield, ArrowRight, Compass, Phone, Hotel, ExternalLink, RefreshCw
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -14,10 +14,10 @@ export default function AskSaha() {
     {
       id: 1,
       sender: 'saha',
-      text: `Namaskaram${user?.name ? `, ${user.name}` : ''}! I am SAHA, your intelligent on-ground travel companion. ${
+      text: `Namaskaram${user?.name ? `, ${user.name}` : ''}! I am SAHA, your context-aware travel companion for Andhra Pradesh. ${
         currentTrip?.destination?.name 
-          ? `I'm aware you are exploring ${currentTrip.destination.name}. How can I assist your journey right now?` 
-          : 'I can help you plan, estimate fares, find authentic food, adapt your budget, or give local tips for Andhra Pradesh destinations.'
+          ? `I see you are exploring **${currentTrip.destination.name}**. How can I assist you with food, next sights, hotels, or route adjustments right now?` 
+          : 'Ask me anything about Andhra destinations, authentic food, hotels, or real-time travel advice!'
       }`,
       type: 'text'
     }
@@ -43,253 +43,243 @@ export default function AskSaha() {
     setInput('');
     setIsTyping(true);
 
-    // Build context
     const context = {
       currentTrip,
       destination: currentTrip?.destination,
-      budget: currentTrip?.planningParams?.totalBudget || 1000,
-      remainingBudget: currentTrip ? ((currentTrip.planningParams?.totalBudget || 1000) - (currentTrip.totalSpent || 0)) : 500,
-      travelers: currentTrip?.planningParams?.travelers || 2,
+      travelers: currentTrip?.travelers || 2,
       itinerary: currentTrip?.stops || []
     };
 
-    // Calculate response via aiService
     setTimeout(() => {
       const response = processQuery(query, context);
       const sahaMsg = { 
         id: Date.now() + 1, 
         sender: 'saha', 
-        text: response.message,
-        type: response.type,
-        data: response.data
+        ...response
       };
       setMessages(prev => [...prev, sahaMsg]);
       setIsTyping(false);
-    }, 600);
+    }, 500);
   };
 
   const quickChips = [
-    'I have ₹200 left. What can I do nearby?',
-    'What can I visit in two hours?',
-    'Where can I eat authentic regional food?',
-    'How should I travel with 3 people?',
-    'Emergency safety numbers'
+    'Where can I eat now?',
+    'What should I visit next?',
+    'I missed my 2 PM attraction. What to do?',
+    'I only have ₹1,000 left',
+    'Find hotels near this destination',
+    'Show emergency contacts'
   ];
 
-  const renderResponseData = (msg) => {
-    if (!msg.data) return null;
+  const renderMessageContent = (msg) => {
+    return (
+      <div className="space-y-3">
+        <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-line text-slate-800">
+          {msg.message || msg.text}
+        </p>
 
-    if (msg.type === 'budget_recommendation' || msg.type === 'places_recommendation' || msg.type === 'time_recommendation') {
-      const attractions = msg.data.attractions || [];
-      const foods = msg.data.food || [];
-
-      return (
-        <div className="mt-3 space-y-2">
-          {attractions.length > 0 && (
-            <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Recommended Spots</span>
-              {attractions.map((attr, idx) => (
-                <div key={idx} className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs flex justify-between items-center gap-2">
-                  <div>
-                    <h5 className="font-bold text-slate-800">{attr.name}</h5>
-                    <p className="text-[11px] text-slate-500">{attr.suggestedDuration || 45}m visit &bull; Entry: ₹{attr.approximateEntryFee || 0}</p>
-                  </div>
-                  <Link to={`/destination/${attr.destinationId || 'vijayawada'}`} className="text-[#0077B6] font-bold text-[11px] hover:underline flex items-center">
-                    Details <ArrowRight className="w-3 h-3 ml-0.5" />
-                  </Link>
-                </div>
-              ))}
+        {/* 1. Food Recommendation Cards */}
+        {msg.type === 'food_recommendation' && msg.restaurants && (
+          <div className="space-y-2 mt-2">
+            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200">
+              <span className="text-[10px] font-black uppercase text-amber-800">Famous Regional Specialties:</span>
+              <p className="text-xs font-bold text-amber-950 mt-0.5">{msg.recommendedDish}</p>
             </div>
-          )}
-
-          {foods.length > 0 && (
-            <div className="space-y-1.5 pt-2">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Affordable Dishes</span>
-              <div className="grid grid-cols-2 gap-2">
-                {foods.map((dish, idx) => (
-                  <div key={idx} className="bg-orange-50/60 p-2 rounded-xl border border-orange-100 text-xs">
-                    <p className="font-bold text-slate-800">{dish.name}</p>
-                    <p className="text-[10px] text-orange-700 font-semibold">~₹{dish.approximatePrice} {dish.vegetarian ? '(Veg)' : ''}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    if (msg.type === 'food_recommendation') {
-      const dishes = msg.data.dishes || [];
-      return (
-        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {dishes.map((dish, idx) => (
-            <div key={idx} className="bg-orange-50/50 p-2.5 rounded-xl border border-orange-100 text-xs flex items-start gap-2">
-              <Utensils className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-bold text-slate-800">{dish.name}</p>
-                <p className="text-[11px] text-slate-500 line-clamp-1">{dish.description}</p>
-                <p className="text-[10px] text-orange-700 font-bold mt-0.5">Approx. ₹{dish.approximatePrice}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    if (msg.type === 'transport_recommendation') {
-      const modes = msg.data.modes || [];
-      return (
-        <div className="mt-3 space-y-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {modes.map((mode, idx) => (
-              <div key={idx} className="bg-teal-50/60 p-2.5 rounded-xl border border-teal-100 text-xs flex items-start gap-2">
-                <Car className="w-4 h-4 text-[#00838F] mt-0.5 flex-shrink-0" />
+            {msg.restaurants.map((r, i) => (
+              <div key={i} className="p-3 bg-white rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center text-xs">
                 <div>
-                  <p className="font-bold text-slate-800">{mode.name}</p>
-                  <p className="text-[10px] text-slate-500">Base: ₹{mode.baseFare} &bull; Rate: ~₹{mode.perKmRate}/km</p>
-                  <p className="text-[10px] text-teal-800 font-semibold mt-0.5">Fits {mode.suitableGroupSize?.min}-{mode.suitableGroupSize?.max} people</p>
+                  <h5 className="font-black text-[#0B2545]">{r.name}</h5>
+                  <p className="text-[11px] text-slate-500">{r.address} • {r.cuisine}</p>
+                  <span className="text-[10px] font-bold text-[#00838F]">Specialty: {r.famousFor}</span>
                 </div>
+                <a href={`tel:${r.phone}`} className="px-3 py-1.5 bg-[#0077B6] text-white rounded-xl text-[11px] font-bold flex items-center gap-1">
+                  <Phone size={11} /> Call
+                </a>
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-slate-400 italic">{msg.data.note}</p>
-        </div>
-      );
-    }
+        )}
 
-    if (msg.type === 'emergency_info') {
-      return (
-        <div className="mt-3 bg-rose-50 p-3 rounded-2xl border border-rose-200 text-xs space-y-2">
-          <div className="grid grid-cols-2 gap-2">
-            <a href="tel:112" className="p-2.5 bg-white rounded-xl border border-rose-200 flex items-center justify-between text-rose-700 font-bold">
-              <span>National Emergency</span>
-              <span className="text-sm bg-rose-100 px-2 py-0.5 rounded-md">112</span>
-            </a>
-            <a href="tel:108" className="p-2.5 bg-white rounded-xl border border-rose-200 flex items-center justify-between text-rose-700 font-bold">
-              <span>Ambulance</span>
-              <span className="text-sm bg-rose-100 px-2 py-0.5 rounded-md">108</span>
-            </a>
+        {/* 2. Attractions Recommendation Cards */}
+        {msg.type === 'attractions_recommendation' && msg.attractions && (
+          <div className="space-y-2 mt-2">
+            {msg.attractions.map((a, i) => (
+              <div key={i} className="p-3 bg-white rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center text-xs">
+                <div>
+                  <span className="text-[10px] font-bold text-[#00838F] uppercase">{a.category}</span>
+                  <h5 className="font-black text-[#0B2545]">{a.name}</h5>
+                  <p className="text-[11px] text-slate-500">⏱️ {a.suggestedDuration} mins • Entry: ₹{a.approximateEntryFee}</p>
+                </div>
+                <Link to={`/destination/${a.destinationId}`} className="px-3 py-1.5 bg-teal-50 text-[#0077B6] font-bold rounded-xl text-[11px]">
+                  Explore →
+                </Link>
+              </div>
+            ))}
           </div>
-          <p className="text-[10px] text-rose-600 font-medium">{msg.data.note}</p>
-        </div>
-      );
-    }
+        )}
 
-    return null;
+        {/* 3. Replanning Suggestions */}
+        {msg.type === 'replanning_advice' && msg.suggestions && (
+          <div className="p-3.5 bg-teal-50 rounded-2xl border border-teal-200 space-y-1.5 text-xs text-[#0B2545]">
+            {msg.suggestions.map((s, i) => (
+              <p key={i} className="font-semibold">{s}</p>
+            ))}
+            <div className="pt-2">
+              <Link to="/my-trip" className="inline-flex items-center gap-1 font-black text-[#0077B6] hover:underline">
+                <RefreshCw size={12} /> Open Dashboard to Auto-Replan →
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* 4. Hotel Recommendation Cards */}
+        {msg.type === 'hotel_recommendation' && msg.hotels && (
+          <div className="space-y-2 mt-2">
+            {msg.hotels.map((h, i) => (
+              <div key={i} className="p-3 bg-white rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center text-xs">
+                <div>
+                  <h5 className="font-black text-[#0B2545]">{h.name}</h5>
+                  <p className="text-[11px] text-slate-500">{h.location} • ₹{h.pricePerNight}/night</p>
+                </div>
+                <a href={h.bookingLink} target="_blank" rel="noreferrer" className="px-3 py-1.5 bg-[#F59E0B] text-white rounded-xl text-[11px] font-bold flex items-center gap-1">
+                  Book <ExternalLink size={11} />
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 5. Emergency Contacts Card */}
+        {msg.type === 'emergency_assistance' && (
+          <div className="p-3.5 bg-rose-50 rounded-2xl border border-rose-200 space-y-2 text-xs">
+            <div className="flex gap-2">
+              <a href="tel:112" className="flex-1 py-2 bg-rose-600 text-white rounded-xl text-center font-black">
+                Call 112 (National)
+              </a>
+              <a href="tel:108" className="flex-1 py-2 bg-amber-600 text-white rounded-xl text-center font-black">
+                Call 108 (Medical)
+              </a>
+            </div>
+            {msg.nearestHospital && (
+              <p className="text-slate-700 font-medium">
+                🏥 <strong>Nearest Hospital:</strong> {msg.nearestHospital.name} ({msg.nearestHospital.phone})
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* 6. Destination Info Highlights */}
+        {msg.keyHighlights && (
+          <div className="space-y-1 mt-2 text-xs">
+            {msg.keyHighlights.map((h, i) => (
+              <p key={i} className="text-slate-700">{h}</p>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen pt-24 pb-20">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 h-[calc(100vh-130px)] flex flex-col">
+    <div className="min-h-screen bg-[#F7FBFC] pt-20 pb-12 flex flex-col">
+      <div className="max-w-4xl mx-auto px-4 w-full flex-1 flex flex-col">
         
         {/* Chat Header */}
-        <div className="bg-white rounded-t-3xl shadow-sm border border-slate-200 p-4 sm:p-5 flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-4 shadow-sm border border-teal-900/10 mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-gradient-to-tr from-[#0077B6] to-[#00838F] rounded-2xl flex items-center justify-center text-white shadow-sm shadow-[#0077B6]/20">
-              <Bot className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-2xl overflow-hidden p-0.5 bg-white border border-teal-500/40 shadow-xs">
+              <img src="/logo.png" alt="SAHA" className="w-full h-full object-contain" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-extrabold text-base text-[#1B2A4A]">Ask SAHA</h1>
-                <span className="px-2 py-0.5 bg-sky-50 text-[#0077B6] font-bold text-[10px] uppercase tracking-wider rounded-md border border-sky-100">
-                  Intelligent Companion
-                </span>
-              </div>
-              <p className="text-xs text-slate-500">
-                {currentTrip ? `Context: Active Trip in ${currentTrip.destination?.name}` : 'Grounded on verified Andhra Pradesh tourism data'}
+              <h2 className="text-sm font-black text-[#0B2545] flex items-center gap-1.5">
+                Ask SAHA AI Companion
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              </h2>
+              <p className="text-[10px] text-slate-500 font-bold">
+                {currentTrip ? `Active in ${currentTrip.destination?.name || 'AP'}` : 'Grounded in Andhra Pradesh Tourism Dataset'}
               </p>
             </div>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-semibold text-slate-500">Verified Intelligence</span>
-          </div>
+          <Link to="/planner" className="text-xs font-bold text-[#0077B6] hover:underline">
+            Plan New Trip →
+          </Link>
         </div>
 
-        {/* Chat Messages Stream */}
-        <div className="flex-1 bg-white border-x border-slate-200 overflow-y-auto p-4 sm:p-6 space-y-4">
-          {messages.map((msg) => {
-            const isUser = msg.sender === 'user';
-            return (
-              <motion.div 
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                key={msg.id} 
-                className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
-              >
-                <div className={`flex max-w-[85%] sm:max-w-[75%] ${isUser ? 'flex-row-reverse' : 'flex-row'} items-start gap-2.5`}>
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-xs ${
-                    isUser ? 'bg-[#1B2A4A]' : 'bg-[#0077B6]'
-                  }`}>
-                    {isUser ? <User className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
-                  </div>
-                  
-                  <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
-                    isUser 
-                      ? 'bg-[#1B2A4A] text-white rounded-tr-xs' 
-                      : 'bg-slate-50 text-slate-800 border border-slate-200 rounded-tl-xs shadow-xs'
-                  }`}>
-                    <p className="whitespace-pre-line text-xs sm:text-sm">{msg.text}</p>
-                    {renderResponseData(msg)}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-          
-          {isTyping && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-start items-center gap-2.5"
+        {/* Chat Messages Log */}
+        <div className="bg-white rounded-3xl p-4 sm:p-6 shadow-sm border border-teal-900/10 flex-1 overflow-y-auto min-h-[420px] max-h-[550px] space-y-4">
+          {messages.map(msg => (
+            <div
+              key={msg.id}
+              className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-[#0077B6] text-white">
-                <Bot className="w-4 h-4" />
+              {msg.sender === 'saha' && (
+                <div className="w-8 h-8 rounded-xl overflow-hidden p-0.5 bg-teal-50 border border-teal-300 flex-shrink-0">
+                  <img src="/logo.png" alt="SAHA" className="w-full h-full object-contain" />
+                </div>
+              )}
+
+              <div
+                className={`max-w-[85%] rounded-3xl p-4 sm:p-5 ${
+                  msg.sender === 'user'
+                    ? 'bg-gradient-to-r from-[#0077B6] to-[#00838F] text-white rounded-br-none shadow-sm'
+                    : 'bg-slate-50 border border-slate-200/80 rounded-bl-none text-[#0B2545]'
+                }`}
+              >
+                {msg.sender === 'user' ? (
+                  <p className="text-xs sm:text-sm font-semibold">{msg.text}</p>
+                ) : (
+                  renderMessageContent(msg)
+                )}
               </div>
-              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs text-slate-500 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-[#0077B6] rounded-full animate-bounce" />
-                <span className="w-1.5 h-1.5 bg-[#0077B6] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                <span className="w-1.5 h-1.5 bg-[#0077B6] rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
-                <span className="ml-1 font-semibold text-slate-600">SAHA is reasoning...</span>
-              </div>
-            </motion.div>
+
+              {msg.sender === 'user' && (
+                <div className="w-8 h-8 rounded-xl bg-[#0B2545] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : <User size={14} />}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {isTyping && (
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span className="w-2 h-2 rounded-full bg-[#0077B6] animate-pulse" />
+              <span>SAHA is retrieving real local data...</span>
+            </div>
           )}
+
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input & Quick Chips */}
-        <div className="bg-white rounded-b-3xl shadow-sm border border-slate-200 p-3 sm:p-4">
-          <div className="flex gap-1.5 overflow-x-auto pb-2 mb-2 hide-scrollbar">
-            {quickChips.map((chip, idx) => (
-              <button 
-                key={idx}
-                onClick={() => handleSend(chip)}
-                className="text-[11px] font-bold bg-sky-50 hover:bg-[#0077B6] text-[#0077B6] hover:text-white border border-sky-100 px-3 py-1.5 rounded-full transition-all whitespace-nowrap flex-shrink-0"
-              >
-                {chip}
-              </button>
-            ))}
-          </div>
-          
-          <div className="flex gap-2">
-            <input 
-              type="text" 
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Ask anything about budget, time, places, transport in AP..."
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#0077B6]"
-            />
-            <button 
-              onClick={() => handleSend()}
-              disabled={!input.trim()}
-              className="bg-[#0077B6] hover:bg-[#00695C] disabled:opacity-40 text-white px-5 rounded-xl transition-all flex items-center justify-center font-bold text-xs shadow-sm"
+        {/* Quick Suggestion Chips */}
+        <div className="py-3 flex overflow-x-auto gap-2 hide-scrollbar">
+          {quickChips.map((chip, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleSend(chip)}
+              className="whitespace-nowrap px-3 py-1.5 bg-white hover:bg-teal-50 border border-slate-200 text-[#0077B6] text-xs font-bold rounded-xl shadow-xs transition-colors"
             >
-              <Send className="w-4 h-4" />
+              {chip}
             </button>
-          </div>
+          ))}
+        </div>
+
+        {/* Chat Input Box */}
+        <div className="bg-white rounded-2xl p-2 shadow-md border border-teal-900/10 flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Ask about places, food, hotels, transport, or budget in AP..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            className="flex-1 px-4 py-2.5 bg-transparent border-0 text-xs sm:text-sm font-medium text-[#0B2545] focus:outline-none placeholder:text-slate-400"
+          />
+          <button
+            onClick={() => handleSend()}
+            className="p-3 bg-gradient-to-r from-[#0077B6] to-[#00A896] hover:from-[#0A3D62] hover:to-[#00838F] text-white rounded-xl shadow-sm transition-all"
+          >
+            <Send size={16} />
+          </button>
         </div>
 
       </div>
