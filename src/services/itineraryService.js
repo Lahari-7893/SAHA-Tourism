@@ -162,6 +162,11 @@ export function generateItinerary({
     const sightsForDay = [];
     const countToPick = pace === 'Relaxed' ? 2 : pace === 'Packed' ? 4 : 3;
 
+    // Replenish pool if empty on long multi-day trips (up to 10 days)
+    if (remainingPool.length < countToPick) {
+      remainingPool = [...scoredAttractions, ...allAttractions.filter(a => a.destinationId !== dest.id).slice(0, 15)];
+    }
+
     for (let i = 0; i < countToPick && remainingPool.length > 0; i++) {
       // Find closest from lastCoords to minimize backtracking
       let closestIdx = 0;
@@ -378,10 +383,23 @@ export function generateItinerary({
     // Hotel stay for multi-day
     const hotelCostPerNight = numDays > 1 ? Math.round(recommendedHotel.pricePerNight * Math.ceil(travelers / 2)) : 0;
 
+    const dayThemesList = [
+      'Cultural Landmarks & Spiritual Heritage',
+      'Scenic Nature, Waterways & Local Crafts',
+      'Hidden Gems & Regional Discoveries',
+      'Historical Forts & Architectural Wonders',
+      'Local Food Trails & Artisan Markets',
+      'Sacred Temples & Peaceful Retreats',
+      'River Viewpoints & Sunset Ghats',
+      'Eco-Tourism & Wildlife Sanctuaries',
+      'Handloom Villages & Cultural Heritage',
+      'Grand Finale: Culinary & Panoramic Views'
+    ];
+
     dailyPlans.push({
       day: dayIndex,
       dateLabel: `Day ${dayIndex}`,
-      theme: dayIndex === 1 ? 'Cultural Landmarks & Spiritual Heritage' : dayIndex === 2 ? 'Scenic Nature, Waterways & Local Crafts' : 'Hidden Gems & Regional Discoveries',
+      theme: dayThemesList[(dayIndex - 1) % dayThemesList.length],
       stops: dayStops,
       daySummary: {
         distanceKm: Number(dayDistance.toFixed(1)),
@@ -400,8 +418,34 @@ export function generateItinerary({
   }
 
   const totalHotelCost = numDays > 1 ? Math.round(recommendedHotel.pricePerNight * (numDays - 1) * Math.ceil(travelers / 2)) : 0;
-  const grandTotalCost = totalTripEntryCost + totalTripTransitCost + totalTripFoodCost + totalHotelCost;
+  const miscCost = 50 * travelers;
+  const grandTotalCost = totalTripEntryCost + totalTripTransitCost + totalTripFoodCost + totalHotelCost + miscCost;
   const budgetRemaining = Math.max(0, totalBudget - grandTotalCost);
+
+  // Why SAHA Chose This Plan reasoning card
+  const interestsFormatted = activeInterests.map(i => i.charAt(0).toUpperCase() + i.slice(1)).join(' + ');
+  const timeFormatted = availableTimeMinutes ? `${Math.round(availableTimeMinutes / 60)} hours` : `${numDays} day(s)`;
+
+  const whyThisPlan = [
+    `Fits your available time (${timeFormatted})`,
+    `Stays within your budget (₹${grandTotalCost} out of ₹${totalBudget})`,
+    `Matches your interests (${interestsFormatted})`,
+    `Minimizes unnecessary travel with smart route optimization`,
+    `Includes authentic local food breaks (${dest.name} specialties)`,
+    `Leaves a 30–40 min safety/time buffer for traffic & delays`
+  ];
+
+  // Itemized cost breakdown
+  const costBreakdown = {
+    transport: { amount: totalTripTransitCost, isVerified: false, label: 'Local Transit (Auto/Bus)' },
+    entryFees: { amount: totalTripEntryCost, isVerified: true, label: 'Attraction Entry Fees' },
+    food: { amount: totalTripFoodCost, isVerified: false, label: 'Meals & Dining' },
+    miscellaneous: { amount: miscCost, isVerified: false, label: 'Bottled Water & Sundries' },
+    accommodation: { amount: totalHotelCost, isVerified: true, label: 'Hotel Accommodation' },
+    total: grandTotalCost,
+    remaining: budgetRemaining,
+    disclaimer: 'Actual fare may vary depending on traffic, time and local conditions.'
+  };
 
   return {
     destination: dest,
@@ -417,6 +461,8 @@ export function generateItinerary({
     dailyPlans,
     groupCompromiseNote,
     weatherAlert,
+    whyThisPlan,
+    costBreakdown,
     summary: {
       totalStops: dailyPlans.reduce((acc, d) => acc + d.stops.filter(s => s.type === 'attraction').length, 0),
       totalMeals: dailyPlans.reduce((acc, d) => acc + d.stops.filter(s => s.type === 'meal').length, 0),
@@ -478,17 +524,72 @@ export function replanForDelay(currentItinerary, delayMinutes = 100) {
   };
 }
 
-// Replan Itinerary dynamically
-export function replanItinerary(currentItinerary, adjustments = {}) {
+// Transport leg comparative analyzer (Walk vs Bus vs Auto) with contextual recommendation
+export function getTransportComparison(distanceKm, budget = 1000) {
+  const dist = Number(distanceKm) || 1.5;
+  const walkMins = Math.max(5, Math.round((dist / 4) * 60));
+  const busMins = Math.max(10, Math.round((dist / 18) * 60));
+  const autoMins = Math.max(5, Math.round((dist / 25) * 60));
+
+  const busFareMin = Math.max(15, Math.round(dist * 3));
+  const busFareMax = Math.max(25, Math.round(dist * 5));
+  const autoFareMin = Math.max(40, Math.round(30 + dist * 14));
+  const autoFareMax = Math.max(70, Math.round(50 + dist * 18));
+
+  let recommended = 'AUTO';
+  let reason = `Auto is recommended because it saves ${walkMins - autoMins} minutes while remaining within your budget.`;
+
+  if (dist < 0.8) {
+    recommended = 'WALK';
+    reason = `Walking is recommended because it's only ${dist} km (${walkMins} mins), free, and lets you enjoy local sights.`;
+  } else if (budget < 400 && dist > 3) {
+    recommended = 'BUS';
+    reason = `Bus is recommended to keep transport costs low (₹${busFareMin}–${busFareMax}) while staying strictly within your budget.`;
+  }
+
+  return {
+    options: [
+      { mode: 'WALK', label: 'WALK', icon: '🚶', timeMins: walkMins, fare: '₹0', isRecommended: recommended === 'WALK' },
+      { mode: 'BUS', label: 'BUS', icon: '🚌', timeMins: busMins, fare: `₹${busFareMin}–${busFareMax}`, isRecommended: recommended === 'BUS' },
+      { mode: 'AUTO', label: 'AUTO', icon: '🛺', timeMins: autoMins, fare: `₹${autoFareMin}–${autoFareMax}`, isRecommended: recommended === 'AUTO' }
+    ],
+    recommendedMode: recommended,
+    recommendationReason: reason
+  };
+}
+
+// Quick Plan Adjustment Handler
+export function applyQuickAdjustment(currentItinerary, actionType) {
+  if (!currentItinerary) return null;
   const currentParams = {
     destinationId: currentItinerary.destination?.id || 'dest_vjw',
     days: currentItinerary.days || 1,
     travelers: currentItinerary.travelers || 2,
-    totalBudget: adjustments.newBudget || currentItinerary.totalBudget || 5000,
-    startTime: adjustments.newStartTime || '09:00 AM',
-    pace: adjustments.newPace || 'Balanced',
-    interests: adjustments.interests || ['Heritage', 'Nature']
+    totalBudget: currentItinerary.totalBudget || 1000,
+    startTime: '09:00 AM',
+    pace: 'Balanced',
+    interests: ['Heritage', 'Food']
   };
+
+  if (actionType === 'lessTime') {
+    currentParams.days = 1;
+    currentParams.availableTimeMinutes = 180; // 3 hours
+    currentParams.pace = 'Packed';
+  } else if (actionType === 'reduceCost') {
+    currentParams.totalBudget = Math.max(300, Math.round(currentItinerary.totalBudget * 0.6));
+    currentParams.travelStyle = 'Budget-Friendly';
+  } else if (actionType === 'addFood') {
+    currentParams.interests = ['Food', 'Heritage', 'Culture'];
+  } else if (actionType === 'moreHeritage') {
+    currentParams.interests = ['Heritage', 'Spiritual', 'Culture'];
+  } else if (actionType === 'moreNature') {
+    currentParams.interests = ['Nature', 'Beaches', 'Adventure'];
+  } else if (actionType === 'avoidWalking') {
+    currentParams.travelStyle = 'Comfort';
+    currentParams.pace = 'Relaxed';
+  } else if (actionType === 'relaxed') {
+    currentParams.pace = 'Relaxed';
+  }
 
   return generateItinerary(currentParams);
 }

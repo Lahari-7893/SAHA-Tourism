@@ -162,7 +162,7 @@ export default function InteractiveMap() {
           {/* Layer Filter Buttons */}
           <div className="flex flex-wrap items-center gap-1.5">
             {[
-              { id: 'destinations', label: '13 Destinations', icon: Landmark, color: 'bg-[#0077B6]' },
+              { id: 'destinations', label: 'Destinations', icon: Landmark, color: 'bg-[#0077B6]' },
               { id: 'attractions', label: 'Attractions', icon: MapPin, color: 'bg-[#00838F]' },
               { id: 'hotels', label: 'Hotels', icon: Hotel, color: 'bg-[#F59E0B]' },
               { id: 'food', label: 'Food & Dining', icon: Utensils, color: 'bg-[#E76F51]' },

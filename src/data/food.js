@@ -70,7 +70,7 @@ export const regionalDishes = [
     approximatePrice: 50,
     rating: 4.7,
     description: 'Rayalaseema’s beloved comfort food — seasoned puffed rice (Borugulu) sautéed with onions, roasted gram powder, and turmeric, served alongside piping hot deep-fried Mirapakaya Bajjis.',
-    image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&q=80&w=600',
+    image: '/images/uggani_bajji.jpg',
     famousAt: 'Kurnool, Nandyal, Dhone'
   },
   {
@@ -82,7 +82,7 @@ export const regionalDishes = [
     approximatePrice: 320,
     rating: 4.9,
     description: 'Fresh Bay of Bengal prawns cooked in a thick, fiery onion-tomato gravy infused with freshly pounded ginger, garlic, green chillies, and curry leaves. Best paired with steamed white rice.',
-    image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=600',
+    image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&q=80&w=800',
     famousAt: 'Visakhapatnam & Kakinada Coast'
   },
   {
@@ -94,7 +94,7 @@ export const regionalDishes = [
     approximatePrice: 120,
     rating: 4.9,
     description: 'A traditional 130-year-old heritage sweet made with rolled maida layers, deep-fried until crisp on the outside, and soaked in cardamom-flavored sugar syrup that bursts with sweetness when bitten.',
-    image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=600',
+    image: '/images/kakinada_kaja.jpg',
     famousAt: 'Kotaiah Sweets, Kakinada'
   },
   {
@@ -106,7 +106,7 @@ export const regionalDishes = [
     approximatePrice: 220,
     rating: 4.9,
     description: 'Wholesome steamed finger millet balls (Ragi Mudda) served with spicy, aromatic country chicken curry (Natukodi) and a dollop of fresh ghee.',
-    image: 'https://images.unsplash.com/photo-1606787366850-de6330128bfc?auto=format&fit=crop&q=80&w=600',
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&q=80&w=800',
     famousAt: 'Gandikota, Kadapa, Tirupati'
   }
 ];

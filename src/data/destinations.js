@@ -130,9 +130,10 @@ export const destinations = [
     tagline: 'Ancient Buddhist Seat & Historic Capital',
     description: 'Amaravati is an ancient heritage cradle on the southern bank of the Krishna River. Renowned for the 2,000-year-old Great Buddhist Stupa (Maha Chaitya), the towering Dhyana Buddha statue, and the holy Amareswara Shiva Temple.',
     coordinates: { lat: 16.5745, lng: 80.3557 },
-    heroImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200',
+    heroImage: '/images/amaravathi_capital.jpg',
     secondaryImages: [
-      'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'
+      '/images/amaravathi_stupa.webp',
+      'https://images.unsplash.com/photo-1621419203897-20b40f5f0ca2?auto=format&fit=crop&q=80&w=800'
     ],
     categories: ['Heritage', 'Spiritual', 'Culture'],
     bestTime: 'October to March',
@@ -326,7 +327,7 @@ export const destinations = [
     tagline: 'Sacred Jyotirlinga in the Dense Nallamala Tiger Sanctuary',
     description: 'Srisailam is a sacred pilgrim and eco-tourism haven situated deep in the Nallamala hills on the Krishna River. It houses the ancient Mallikarjuna Swamy Jyotirlinga and Bhramaramba Devi Shakti Peeth, the massive Srisailam Dam, ropeway, and Tiger Reserve.',
     coordinates: { lat: 16.0748, lng: 78.8681 },
-    heroImage: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=1200',
+    heroImage: '/images/srisailam_temple.jpg',
     secondaryImages: [
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'
     ],

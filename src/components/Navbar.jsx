@@ -27,7 +27,7 @@ export default function Navbar() {
     { name: 'Trip Planner', path: '/planner' },
     { name: 'Hotels', path: '/hotels' },
     { name: 'Food', path: '/food' },
-    { name: 'AP Map', path: '/map' },
+    { name: 'Interactive Map', path: '/map' },
     { name: 'Passport 🏆', path: '/passport' },
     { name: 'Journal 📸', path: '/journal' },
     { name: 'My Trip', path: '/my-trip', badge: currentTrip ? 'LIVE' : null },

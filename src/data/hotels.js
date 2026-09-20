@@ -1,5 +1,5 @@
-// SAHA - Verified Andhra Pradesh Hotels & Stays Dataset
-// Real, verified accommodations across all 13 AP destinations
+// SAHA - Verified Hotels & Stays Dataset (18 Distinct Accommodations)
+// Real, verified accommodations across all destinations
 
 export const hotels = [
   // ================= VIJAYAWADA =================
@@ -14,7 +14,7 @@ export const hotels = [
     location: 'M.G. Road, Vijayawada, NTR District',
     distanceFromCenter: '1.2 km from City Center',
     coordinates: { lat: 16.5020, lng: 80.6350 },
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800',
+    image: '/images/hotel_taj.jpg',
     facilities: ['Swimming Pool', 'Multi-cuisine Dining', 'Free High-Speed WiFi', 'Fitness Center', 'Valet Parking', 'Airport Shuttle'],
     phone: '+91 866 6644444',
     bookingLink: 'https://www.ihcltata.com',
@@ -38,7 +38,7 @@ export const hotels = [
     location: 'Bharathi Nagar, Ring Road, Vijayawada',
     distanceFromCenter: '3.5 km from City Center',
     coordinates: { lat: 16.5050, lng: 80.6650 },
-    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=800',
+    image: '/images/hotel_novotel.jpg',
     facilities: ['Rooftop Infinity Pool', 'Spa & Wellness', '24/7 Food Exchange', 'Sky Bar', 'Free WiFi', 'Electric Vehicle Charging'],
     phone: '+91 866 6688888',
     bookingLink: 'https://all.accor.com',
@@ -62,7 +62,7 @@ export const hotels = [
     location: 'Berm Park, Krishna River Bank, Bhavanipuram',
     distanceFromCenter: '4.0 km from City Center',
     coordinates: { lat: 16.5200, lng: 80.5950 },
-    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800',
+    image: '/images/hotel_berm.jpg',
     facilities: ['Riverfront Cottages', 'Boat Jetty Access', 'Garden Restaurant', 'Free Parking', 'Children Play Area'],
     phone: '+91 866 2418057',
     bookingLink: 'https://tourism.ap.gov.in',
@@ -73,7 +73,7 @@ export const hotels = [
     ],
     checkIn: '12:00 PM',
     checkOut: '11:00 AM',
-    description: 'Official Andhra Pradesh Tourism resort with wooden cottages directly on the Krishna River bank and Bhavani Island.'
+    description: 'Official APTDC resort with wooden cottages directly on the Krishna River bank and Bhavani Island.'
   },
   {
     id: 'hotel_vjw_04',
@@ -86,7 +86,7 @@ export const hotels = [
     location: 'Labbipet, M.G. Road, Vijayawada',
     distanceFromCenter: '1.8 km from City Center',
     coordinates: { lat: 16.5030, lng: 80.6410 },
-    image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=800',
+    image: '/images/hotel_fortune.jpg',
     facilities: ['Multi-cuisine Zodiac Restaurant', 'Free Breakfast', 'WiFi', 'Gym', 'Business Center'],
     phone: '+91 866 3988000',
     bookingLink: 'https://www.itchotels.com',
@@ -112,7 +112,7 @@ export const hotels = [
     location: 'Beach Road, RK Beach, Visakhapatnam',
     distanceFromCenter: 'Beachfront (Direct Sea View)',
     coordinates: { lat: 17.7110, lng: 83.3220 },
-    image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=800',
+    image: '/images/hotel_novotel_beach.jpg',
     facilities: ['Infinity Ocean Pool', 'Private Sea View Balconies', 'Spa', 'The Square Restaurant', 'Rooftop Lounge'],
     phone: '+91 891 3045678',
     bookingLink: 'https://all.accor.com',
@@ -136,8 +136,8 @@ export const hotels = [
     location: 'Rushikonda Beach Hilltop, Visakhapatnam',
     distanceFromCenter: '12 km from City Center (On Blue Flag Beach)',
     coordinates: { lat: 17.7850, lng: 83.3860 },
-    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=800',
-    facilities: ['Sea-facing Hilltop Cottages', 'Direct Beach Access', 'Coastal Andhra Dining', 'Free Parking'],
+    image: '/images/hotel_rushikonda.jpg',
+    facilities: ['Sea-facing Hilltop Cottages', 'Direct Beach Access', 'Coastal Dining', 'Free Parking'],
     phone: '+91 891 2788820',
     bookingLink: 'https://tourism.ap.gov.in',
     roomDetails: [
@@ -160,8 +160,8 @@ export const hotels = [
     location: 'Suryabagh, Jagadamba Junction, Visakhapatnam',
     distanceFromCenter: '0.5 km from City Center',
     coordinates: { lat: 17.7120, lng: 83.3010 },
-    image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=800',
-    facilities: ['Heritage Andhra Dining (Dakshin)', 'Complimentary Breakfast', 'Free WiFi', 'Fitness Center'],
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800',
+    facilities: ['Heritage Local Dining (Dakshin)', 'Complimentary Breakfast', 'Free WiFi', 'Fitness Center'],
     phone: '+91 891 2564825',
     bookingLink: 'https://www.daspallahotels.com',
     roomDetails: [
@@ -171,7 +171,7 @@ export const hotels = [
     ],
     checkIn: '12:00 PM',
     checkOut: '11:00 AM',
-    description: 'A beloved Vizag hospitality landmark famous for its legendary Andhra meals and central city location.'
+    description: 'A beloved Vizag hospitality landmark famous for its legendary authentic meals and central city location.'
   },
 
   // ================= TIRUPATI =================
@@ -186,7 +186,7 @@ export const hotels = [
     location: 'Shilparamam, Tiruchanoor Road, Tirupati',
     distanceFromCenter: '3.0 km from Railway Station',
     coordinates: { lat: 13.6200, lng: 79.4350 },
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=800',
     facilities: ['Outdoor Pool', 'Pure Vegetarian Rainbow Restaurant', 'Spa', 'Free WiFi', 'TTD Darshan Helpdesk'],
     phone: '+91 877 6688888',
     bookingLink: 'https://www.itchotels.com',
@@ -210,7 +210,7 @@ export const hotels = [
     location: 'Near Ramanuja Circle, Renigunta Road, Tirupati',
     distanceFromCenter: '1.5 km from Railway Station',
     coordinates: { lat: 13.6280, lng: 79.4300 },
-    image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&q=80&w=800',
     facilities: ['Navrattan Pure Veg Dining', 'Swimming Pool', 'Travel Desk', 'Free Parking', 'AC Deluxe Rooms'],
     phone: '+91 877 2237773',
     bookingLink: 'https://www.hotelbliss.org',
@@ -236,7 +236,7 @@ export const hotels = [
     location: 'Near Tribal Museum, Araku Valley',
     distanceFromCenter: '0.5 km from Araku Town Center',
     coordinates: { lat: 18.3310, lng: 82.8720 },
-    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800',
+    image: '/images/hotel_haritha.jpg',
     facilities: ['Garden Cottages', 'Tribal Dhimsa Dance in Evening', 'Campfire Facility', 'Restaurant', 'Free Parking'],
     phone: '+91 8936 249490',
     bookingLink: 'https://tourism.ap.gov.in',
@@ -260,7 +260,7 @@ export const hotels = [
     location: 'Tyda Forest, Visakhapatnam-Araku Road',
     distanceFromCenter: '35 km before Araku in Dense Forest',
     coordinates: { lat: 18.2100, lng: 83.0500 },
-    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=800',
+    image: '/images/araku_valley.jpg',
     facilities: ['Log Huts & Tree Cottages', 'Guided Forest Treks', 'Bird Watching Trails', 'Organic Dining', 'Night Campfire'],
     phone: '+91 891 2788820',
     bookingLink: 'https://tourism.ap.gov.in',
@@ -271,7 +271,7 @@ export const hotels = [
     ],
     checkIn: '12:00 PM',
     checkOut: '11:00 AM',
-    description: 'Eco-tourism forest camp maintained by AP Forest Department and APTDC with log huts surrounded by wildlife.'
+    description: 'Eco-tourism forest camp maintained by Forest Department and APTDC with log huts surrounded by wildlife.'
   },
 
   // ================= GANDIKOTA =================
@@ -286,8 +286,8 @@ export const hotels = [
     location: 'Near Gandikota Fort Entrance, Jammalamadugu',
     distanceFromCenter: '500 meters from Gorge Viewpoint',
     coordinates: { lat: 14.8120, lng: 78.2840 },
-    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800',
-    facilities: ['AC Rooms & Suites', 'On-site Andhra Restaurant', 'Expansive Green Lawns', 'Direct Walkway to Fort', 'Free Parking'],
+    image: '/images/hotel_budget.jpg',
+    facilities: ['AC Rooms & Suites', 'On-site Restaurant', 'Expansive Green Lawns', 'Direct Walkway to Fort', 'Free Parking'],
     phone: '+91 91000 87310',
     bookingLink: 'https://tourism.ap.gov.in',
     roomDetails: [
@@ -310,8 +310,8 @@ export const hotels = [
     location: 'Pennar River Gorge Cliffside, Gandikota',
     distanceFromCenter: 'Overlooking the Canyon',
     coordinates: { lat: 14.8150, lng: 78.2870 },
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800',
-    facilities: ['Waterproof Camping Tents', 'Night Stargazing & Campfire', 'Kayaking at Mylavaram', 'Local Rayalaseema Dinner included'],
+    image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80&w=800',
+    facilities: ['Waterproof Camping Tents', 'Night Stargazing & Campfire', 'Kayaking at Mylavaram', 'Local Dinner included'],
     phone: '+91 96405 05070',
     bookingLink: 'https://freakouts.com',
     roomDetails: [
@@ -336,7 +336,7 @@ export const hotels = [
     location: 'Gowthami Ghat Road, Godavari Riverbank, Rajahmundry',
     distanceFromCenter: '1.0 km from Pushkar Ghat',
     coordinates: { lat: 17.0080, lng: 81.7720 },
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=800',
     facilities: ['Water Park & Swimming Pool', 'River View Rooms', 'Multi-cuisine Restaurant', 'Godavari Boat Cruise Desk'],
     phone: '+91 883 2447788',
     bookingLink: 'https://www.riverbayresort.com',
@@ -360,8 +360,8 @@ export const hotels = [
     location: 'Dindi Village, Malikipuram Mandal, Konaseema',
     distanceFromCenter: 'On Godavari Delta Backwaters',
     coordinates: { lat: 16.4850, lng: 81.8250 },
-    image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=800',
-    facilities: ['Backwater Facing Cottages', 'Houseboat Cruises Booking', 'Fresh Godavari Seafood Restaurant', 'Swimming Pool'],
+    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800',
+    facilities: ['Backwater Facing Cottages', 'Houseboat Cruises Booking', 'Fresh Seafood Restaurant', 'Swimming Pool'],
     phone: '+91 8862 223388',
     bookingLink: 'https://tourism.ap.gov.in',
     roomDetails: [
@@ -386,7 +386,7 @@ export const hotels = [
     location: 'Near Srisailam Temple & Ropeway, Nandyal District',
     distanceFromCenter: '600 meters from Main Temple',
     coordinates: { lat: 16.0760, lng: 78.8670 },
-    image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=800',
+    image: '/images/srisailam_temple.jpg',
     facilities: ['AC & Non-AC Rooms', 'Pure Vegetarian Dining Hall', 'Spacious Parking', 'Temple Darshan Assistance'],
     phone: '+91 8524 288365',
     bookingLink: 'https://tourism.ap.gov.in',
@@ -412,7 +412,7 @@ export const hotels = [
     location: 'Hilltop, Horsley Hills, Annamayya District',
     distanceFromCenter: 'Atop the Hill Station (1290m altitude)',
     coordinates: { lat: 13.6600, lng: 78.3980 },
-    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800',
+    image: '/images/hotel_luxury.jpg',
     facilities: ['Heritage Governor’s Suite & Cottages', 'Swimming Pool', 'Panoramic Viewpoint Deck', 'Hill Dining Restaurant'],
     phone: '+91 8571 279323',
     bookingLink: 'https://tourism.ap.gov.in',
@@ -423,7 +423,7 @@ export const hotels = [
     ],
     checkIn: '12:00 PM',
     checkOut: '11:00 AM',
-    description: 'Charming hill resort with cool breezes, eucalyptus scent, and views overlooking the Rayalaseema valleys.'
+    description: 'Charming hill resort with cool breezes, eucalyptus scent, and views overlooking the valleys.'
   },
   {
     id: 'hotel_knl_01',
@@ -447,7 +447,7 @@ export const hotels = [
     ],
     checkIn: '12:00 PM',
     checkOut: '11:00 AM',
-    description: 'Premier business and family hotel in Kurnool with excellent Rayalaseema cuisine and prompt service.'
+    description: 'Premier business and family hotel in Kurnool with excellent regional cuisine and prompt service.'
   }
 ];
 

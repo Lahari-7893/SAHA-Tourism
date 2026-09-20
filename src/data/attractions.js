@@ -112,7 +112,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 50,
     timings: '06:00 AM – 08:00 PM',
-    images: ['https://images.unsplash.com/photo-1625531061730-a9cbfa36f6d6?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/kailasagiri.jpg'],
     bestTime: '04:30 PM – 07:00 PM (Sunset)',
     tips: 'Take the cable car (ropeway) up from the base for scenic coastline views.',
     isApproximate: false
@@ -144,7 +144,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 0,
     timings: '07:00 AM – 04:00 PM, 06:00 PM – 09:00 PM',
-    images: ['https://images.unsplash.com/photo-1598974357801-cb8e63cc7337?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/simhachalam.jpg'],
     bestTime: 'Morning',
     tips: 'Chandanotsavam is the annual festival when the true form of the deity is revealed.',
     isApproximate: false
@@ -194,7 +194,7 @@ export const attractions = [
     suggestedDuration: 90,
     approximateEntryFee: 0,
     timings: '05:00 AM – 09:00 PM',
-    images: ['https://images.unsplash.com/photo-1598974357801-cb8e63cc7337?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/padmavathi_temple.jpg'],
     bestTime: 'Morning or Evening',
     tips: 'Located just 5 km from Tirupati railway station in Tiruchanur village.',
     isApproximate: false
@@ -210,7 +210,7 @@ export const attractions = [
     suggestedDuration: 60,
     approximateEntryFee: 0,
     timings: '05:30 AM – 08:30 PM',
-    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/kapileswara_temple.jpg'],
     bestTime: 'Morning (especially during monsoon/winter)',
     tips: 'The waterfall is at its magnificent best between October and January.',
     isApproximate: false
@@ -226,7 +226,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 25,
     timings: '09:00 AM – 05:30 PM (Sound & Light show at 07:00 PM)',
-    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/chandragiri_fort.jpg'],
     bestTime: 'Late Afternoon',
     tips: '14 km from Tirupati town. The Indo-Saracenic Raja Mahal architecture is stunning.',
     isApproximate: false
@@ -244,7 +244,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 80,
     timings: '10:00 AM – 05:00 PM',
-    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/borra_caves.jpg'],
     bestTime: '10:00 AM – 02:00 PM',
     tips: 'Wear shoes with good grip as cave pathways can be damp. Located 30 km before Araku on the Vizag route.',
     isApproximate: false
@@ -260,7 +260,7 @@ export const attractions = [
     suggestedDuration: 90,
     approximateEntryFee: 40,
     timings: '09:00 AM – 07:00 PM',
-    images: ['/images/araku_valley.jpg'],
+    images: ['/images/araku_tribal_museum.jpg'],
     bestTime: 'Morning or Evening',
     tips: 'Taste the signature Araku chocolate coffee and buy organic coffee beans directly at the tasting bar.',
     isApproximate: false
@@ -276,7 +276,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 20,
     timings: '09:00 AM – 05:00 PM',
-    images: ['/images/araku_valley.jpg'],
+    images: ['/images/chaparai_waterfalls.jpg'],
     bestTime: '11:00 AM – 03:00 PM',
     tips: 'Taste freshly cooked bamboo chicken (Bongu Chicken) prepared on open fires by local cooks.',
     isApproximate: false
@@ -292,7 +292,7 @@ export const attractions = [
     suggestedDuration: 60,
     approximateEntryFee: 30,
     timings: '08:30 AM – 06:00 PM',
-    images: ['https://images.unsplash.com/photo-1617056345601-38384d2b2700?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/padmapuram_gardens.jpg'],
     bestTime: 'Morning',
     tips: 'Great place for morning walks and peaceful photography with towering pine and eucalyptus trees.',
     isApproximate: false
@@ -326,7 +326,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 0,
     timings: '06:00 AM – 06:00 PM',
-    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/madhavaraya_temple.jpg'],
     bestTime: 'Morning or Late Afternoon',
     tips: 'Wear comfortable walking shoes. Climb the granary roof for fort-wide views.',
     isApproximate: false
@@ -342,7 +342,7 @@ export const attractions = [
     suggestedDuration: 90,
     approximateEntryFee: 50,
     timings: '09:00 AM – 05:30 PM',
-    images: ['https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/mylavaram_dam.jpg'],
     bestTime: 'Afternoon to Sunset',
     tips: 'Combine with Gandikota tour. Great spot to relax after hiking the canyon.',
     isApproximate: false
@@ -444,7 +444,7 @@ export const attractions = [
     suggestedDuration: 180,
     approximateEntryFee: 0,
     timings: '04:30 AM – 10:00 PM',
-    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/mallikarjuna_temple.jpg'],
     bestTime: 'Morning or Evening Darshan',
     tips: 'Pilgrims can perform Sparsha Darshan (touching the sacred lingam) during designated morning hours.',
     isApproximate: false
@@ -460,7 +460,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 65, // Ropeway round trip
     timings: '06:00 AM – 06:00 PM',
-    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/srisailam_ropeway.jpg'],
     bestTime: 'Morning or 04:00 PM',
     tips: 'Take the motorboat ride from Pathalaganga to the mystical Akkamahadevi Caves (16 km upstream).',
     isApproximate: false
@@ -494,7 +494,7 @@ export const attractions = [
     suggestedDuration: 90,
     approximateEntryFee: 0,
     timings: '08:00 AM – 08:00 PM',
-    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/atreyapuram_pootharekulu.jpg'],
     bestTime: 'Anytime during the day',
     tips: 'Watch the delicate process of baking paper-thin rice starch sheets on inverted clay pots.',
     isApproximate: false
@@ -544,7 +544,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 30,
     timings: '08:00 AM – 06:00 PM',
-    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/oravakallu_rock_garden.jpg'],
     bestTime: '08:00 AM – 11:00 AM or 04:00 PM – 06:00 PM',
     tips: '20 km from Kurnool on NH40. Beautiful backdrop for photography and easy rock trekking.',
     isApproximate: false
@@ -560,7 +560,7 @@ export const attractions = [
     suggestedDuration: 150,
     approximateEntryFee: 70,
     timings: '10:00 AM – 05:00 PM',
-    images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800'],
+    images: ['https://hblimg.mmtcdn.com/content/hubble/img/kurnooldestimages/mmt/activities/m_Belum_Caves_l_480_640.jpg'],
     bestTime: '10:00 AM – 02:00 PM',
     tips: 'Well-lit with oxygen blowers installed along the tourist pathways. Carry water as it can feel warm inside.',
     isApproximate: false
@@ -612,7 +612,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 25,
     timings: '09:00 AM – 05:00 PM (Closed Fridays)',
-    images: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/amaravathi_stupa.webp'],
     bestTime: 'Morning or 03:30 PM',
     tips: 'Preserved by the Archaeological Survey of India (ASI). Guided audio tours available.',
     isApproximate: false
@@ -628,7 +628,7 @@ export const attractions = [
     suggestedDuration: 90,
     approximateEntryFee: 20,
     timings: '08:00 AM – 07:00 PM',
-    images: ['https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=800'],
+    images: ['https://images.unsplash.com/photo-1621419203897-20b40f5f0ca2?auto=format&fit=crop&q=80&w=800'],
     bestTime: 'Evening sunset along the Krishna River',
     tips: 'Lit up dramatically in the evening. River breeze makes it a tranquil meditation spot.',
     isApproximate: false
@@ -646,7 +646,7 @@ export const attractions = [
     suggestedDuration: 180,
     approximateEntryFee: 30,
     timings: '08:00 AM – 05:00 PM',
-    images: ['https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&q=80&w=800'],
+    images: ['https://hblimg.mmtcdn.com/content/hubble/img/ttd_images/mmt/activities/m_Pulicat_lake_l_480_640.jpg'],
     bestTime: 'Morning (07:30 AM – 11:00 AM)',
     tips: 'The annual Flamingo Festival in January brings boat rides and guided bird-watching camps.',
     isApproximate: false
@@ -662,7 +662,7 @@ export const attractions = [
     suggestedDuration: 120,
     approximateEntryFee: 0,
     timings: '06:00 AM – 07:00 PM',
-    images: ['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800'],
+    images: ['/images/mypadu_beach.jpg'],
     bestTime: '04:00 PM – 06:30 PM',
     tips: '25 km from Nellore city. Try fresh sea-fish fries cooked by local stalls on the beach.',
     isApproximate: false

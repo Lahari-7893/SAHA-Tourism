@@ -2,13 +2,18 @@
 // Verified Indian Tourism Languages: Telugu, Tamil, Hindi, Kannada, Malayalam, Odia, English
 
 export const languages = [
-  { code: 'te', name: 'Telugu (తెలుగు)', speechCode: 'te-IN', flag: '🇮🇳' },
-  { code: 'ta', name: 'Tamil (தமிழ்)', speechCode: 'ta-IN', flag: '🇮🇳' },
-  { code: 'hi', name: 'Hindi (हिन्दी)', speechCode: 'hi-IN', flag: '🇮🇳' },
-  { code: 'kn', name: 'Kannada (ಕನ್ನಡ)', speechCode: 'kn-IN', flag: '🇮🇳' },
-  { code: 'ml', name: 'Malayalam (മലയാളം)', speechCode: 'ml-IN', flag: '🇮🇳' },
-  { code: 'en', name: 'English', speechCode: 'en-IN', flag: '🌐' },
-  { code: 'or', name: 'Odia (ଓଡ଼ିଆ)', speechCode: 'or-IN', flag: '🇮🇳' }
+  { code: 'en', name: 'English', speechCode: 'en-US', synthCode: 'en-US', flag: '🌐' },
+  { code: 'te', name: 'Telugu (తెలుగు)', speechCode: 'te-IN', synthCode: 'te-IN', flag: '🇮🇳' },
+  { code: 'hi', name: 'Hindi (हिन्दी)', speechCode: 'hi-IN', synthCode: 'hi-IN', flag: '🇮🇳' },
+  { code: 'ta', name: 'Tamil (தமிழ்)', speechCode: 'ta-IN', synthCode: 'ta-IN', flag: '🇮🇳' },
+  { code: 'kn', name: 'Kannada (ಕನ್ನಡ)', speechCode: 'kn-IN', synthCode: 'kn-IN', flag: '🇮🇳' },
+  { code: 'ml', name: 'Malayalam (മലയാളം)', speechCode: 'ml-IN', synthCode: 'ml-IN', flag: '🇮🇳' },
+  { code: 'bn', name: 'Bengali (বাংলা)', speechCode: 'bn-IN', synthCode: 'bn-IN', flag: '🇮🇳' },
+  { code: 'mr', name: 'Marathi (मराठी)', speechCode: 'mr-IN', synthCode: 'mr-IN', flag: '🇮🇳' },
+  { code: 'gu', name: 'Gujarati (ગુજરાતી)', speechCode: 'gu-IN', synthCode: 'gu-IN', flag: '🇮🇳' },
+  { code: 'pa', name: 'Punjabi (ਪੰਜਾਬੀ)', speechCode: 'pa-IN', synthCode: 'pa-IN', flag: '🇮🇳' },
+  { code: 'ur', name: 'Urdu (اردو)', speechCode: 'ur-IN', synthCode: 'ur-IN', flag: '🇮🇳' },
+  { code: 'or', name: 'Odia (ଓଡ଼ିଆ)', speechCode: 'or-IN', synthCode: 'or-IN', flag: '🇮🇳' }
 ];
 
 export const phrases = [
